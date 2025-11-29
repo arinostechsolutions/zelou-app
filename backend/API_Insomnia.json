@@ -1,0 +1,1183 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2025-11-28T12:00:00.000Z",
+  "__export_source": "insomnia.desktop.app:v2023.5.8",
+  "resources": [
+    {
+      "_id": "req_auth_register",
+      "parentId": "fld_auth",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "url": "{{ _.base_url }}/api/auth/register",
+      "name": "POST /auth/register",
+      "description": "Registrar novo usuário com código de convite",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"João Silva\",\n  \"email\": \"joao@example.com\",\n  \"password\": \"senha123\",\n  \"cpf\": \"12345678900\",\n  \"phone\": \"11999999999\",\n  \"inviteCode\": \"ABC123\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_auth_login",
+      "parentId": "fld_auth",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "url": "{{ _.base_url }}/api/auth/login",
+      "name": "POST /auth/login",
+      "description": "Fazer login",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"joao@example.com\",\n  \"password\": \"senha123\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_auth_me",
+      "parentId": "fld_auth",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "url": "{{ _.base_url }}/api/auth/me",
+      "name": "GET /auth/me",
+      "description": "Obter dados do usuário autenticado",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_condominiums_list",
+      "parentId": "fld_condominiums",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "url": "{{ _.base_url }}/api/condominiums",
+      "name": "GET /condominiums",
+      "description": "Listar condomínios (Master Admin)",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_condominiums_create",
+      "parentId": "fld_condominiums",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "url": "{{ _.base_url }}/api/condominiums",
+      "name": "POST /condominiums",
+      "description": "Criar condomínio (Master Admin)",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Residencial Flores\",\n  \"address\": {\n    \"street\": \"Rua das Flores\",\n    \"number\": \"123\",\n    \"neighborhood\": \"Centro\",\n    \"city\": \"São Paulo\",\n    \"state\": \"SP\",\n    \"zipCode\": \"01234-567\"\n  },\n  \"cnpj\": \"12345678000199\",\n  \"phone\": \"11999999999\",\n  \"email\": \"contato@residencialflores.com\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_condominiums_detail",
+      "parentId": "fld_condominiums",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "url": "{{ _.base_url }}/api/condominiums/:id",
+      "name": "GET /condominiums/:id",
+      "description": "Obter detalhes de um condomínio",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_condominiums_update",
+      "parentId": "fld_condominiums",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "url": "{{ _.base_url }}/api/condominiums/:id",
+      "name": "PUT /condominiums/:id",
+      "description": "Atualizar condomínio (Master Admin)",
+      "method": "PUT",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Residencial Flores Atualizado\",\n  \"phone\": \"11888888888\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_condominiums_invite_codes",
+      "parentId": "fld_condominiums",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "url": "{{ _.base_url }}/api/condominiums/:id/invite-codes",
+      "name": "GET /condominiums/:id/invite-codes",
+      "description": "Listar códigos de convite de um condomínio",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_condominiums_generate_invite",
+      "parentId": "fld_condominiums",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "url": "{{ _.base_url }}/api/condominiums/:id/invite-codes",
+      "name": "POST /condominiums/:id/invite-codes",
+      "description": "Gerar código de convite",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"role\": \"morador\",\n  \"block\": \"A\",\n  \"unit\": \"101\",\n  \"expiresInDays\": 7,\n  \"maxUses\": 1\n}"
+      },
+      "parameters": [],
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_users_list",
+      "parentId": "fld_users",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "url": "{{ _.base_url }}/api/users",
+      "name": "GET /users",
+      "description": "Listar usuários",
+      "method": "GET",
+      "body": {},
+      "parameters": [
+        { "name": "role", "value": "", "description": "Filtrar por role" },
+        { "name": "condominiumId", "value": "", "description": "Filtrar por condomínio" }
+      ],
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_users_create",
+      "parentId": "fld_users",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "url": "{{ _.base_url }}/api/users",
+      "name": "POST /users",
+      "description": "Criar usuário (Admin/Síndico)",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Maria Porteira\",\n  \"email\": \"maria@example.com\",\n  \"password\": \"senha123\",\n  \"cpf\": \"98765432100\",\n  \"phone\": \"11988888888\",\n  \"role\": \"porteiro\",\n  \"condominiumId\": \"condominium_id_here\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_users_detail",
+      "parentId": "fld_users",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "url": "{{ _.base_url }}/api/users/:id",
+      "name": "GET /users/:id",
+      "description": "Obter detalhes de um usuário",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_users_update",
+      "parentId": "fld_users",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "url": "{{ _.base_url }}/api/users/:id",
+      "name": "PUT /users/:id",
+      "description": "Atualizar usuário",
+      "method": "PUT",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Maria Porteira Atualizada\",\n  \"phone\": \"11977777777\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_users_lookup",
+      "parentId": "fld_users",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "url": "{{ _.base_url }}/api/users/lookup?block=A&unit=101",
+      "name": "GET /users/lookup",
+      "description": "Buscar morador por bloco/unidade (Porteiro)",
+      "method": "GET",
+      "body": {},
+      "parameters": [
+        { "name": "block", "value": "A", "description": "Bloco" },
+        { "name": "unit", "value": "101", "description": "Número da unidade" }
+      ],
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_users_push_token",
+      "parentId": "fld_users",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "url": "{{ _.base_url }}/api/users/me/push-token",
+      "name": "PUT /users/me/push-token",
+      "description": "Atualizar push token do usuário",
+      "method": "PUT",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"pushToken\": \"ExponentPushToken[xxxxxxxxxxxxxx]\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_deliveries_list",
+      "parentId": "fld_deliveries",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "url": "{{ _.base_url }}/api/deliveries",
+      "name": "GET /deliveries",
+      "description": "Listar entregas",
+      "method": "GET",
+      "body": {},
+      "parameters": [
+        { "name": "status", "value": "", "description": "pendente ou retirada" },
+        { "name": "search", "value": "", "description": "Buscar por nome ou unidade" }
+      ],
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_deliveries_create",
+      "parentId": "fld_deliveries",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "url": "{{ _.base_url }}/api/deliveries",
+      "name": "POST /deliveries",
+      "description": "Registrar nova entrega (Porteiro) - Envia push notification",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"residentId\": \"user_id_here\",\n  \"photoUrl\": \"https://example.com/photo.jpg\",\n  \"packageType\": \"Encomenda\",\n  \"volumeNumber\": \"2\",\n  \"notes\": \"Frágil\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_deliveries_detail",
+      "parentId": "fld_deliveries",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "url": "{{ _.base_url }}/api/deliveries/:id",
+      "name": "GET /deliveries/:id",
+      "description": "Obter detalhes de uma entrega",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_deliveries_retirar",
+      "parentId": "fld_deliveries",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "url": "{{ _.base_url }}/api/deliveries/:id/retirar",
+      "name": "PUT /deliveries/:id/retirar",
+      "description": "Confirmar retirada (Porteiro)",
+      "method": "PUT",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"signature\": \"base64_signature\",\n  \"retrievalPhoto\": \"https://example.com/retrieval.jpg\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_reports_list",
+      "parentId": "fld_reports",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "url": "{{ _.base_url }}/api/reports",
+      "name": "GET /reports",
+      "description": "Listar irregularidades",
+      "method": "GET",
+      "body": {},
+      "parameters": [
+        { "name": "status", "value": "", "description": "aberta, andamento, concluida" }
+      ],
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_reports_create",
+      "parentId": "fld_reports",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "url": "{{ _.base_url }}/api/reports",
+      "name": "POST /reports",
+      "description": "Criar irregularidade",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"photos\": [\"https://example.com/photo1.jpg\"],\n  \"category\": \"Elétrica\",\n  \"description\": \"Lâmpada queimada no corredor\",\n  \"location\": \"Corredor do 2º andar\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_reports_detail",
+      "parentId": "fld_reports",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "url": "{{ _.base_url }}/api/reports/:id",
+      "name": "GET /reports/:id",
+      "description": "Obter detalhes de uma irregularidade",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_reports_status",
+      "parentId": "fld_reports",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "url": "{{ _.base_url }}/api/reports/:id/status",
+      "name": "PUT /reports/:id/status",
+      "description": "Atualizar status (Zelador/Síndico)",
+      "method": "PUT",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"status\": \"andamento\",\n  \"comment\": \"Em análise\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_areas_list",
+      "parentId": "fld_areas",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "url": "{{ _.base_url }}/api/areas",
+      "name": "GET /areas",
+      "description": "Listar áreas comuns",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_areas_create",
+      "parentId": "fld_areas",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "url": "{{ _.base_url }}/api/areas",
+      "name": "POST /areas",
+      "description": "Criar área comum (Síndico/Zelador)",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Churrasqueira\",\n  \"description\": \"Área de churrasqueira com capacidade para 30 pessoas\",\n  \"rules\": {\n    \"maxReservationsPerDay\": 1,\n    \"capacity\": 30,\n    \"fee\": 150.00,\n    \"feePercentage\": 0,\n    \"cancellationDeadline\": 24,\n    \"requiresApproval\": true\n  },\n  \"availableDays\": [0, 6],\n  \"availableSlots\": [\"10:00-14:00\", \"15:00-19:00\", \"20:00-00:00\"]\n}"
+      },
+      "parameters": [],
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_areas_detail",
+      "parentId": "fld_areas",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "url": "{{ _.base_url }}/api/areas/:id",
+      "name": "GET /areas/:id",
+      "description": "Obter detalhes de uma área",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_areas_availability",
+      "parentId": "fld_areas",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "url": "{{ _.base_url }}/api/areas/:id/availability?month=12&year=2025",
+      "name": "GET /areas/:id/availability",
+      "description": "Obter disponibilidade mensal de uma área",
+      "method": "GET",
+      "body": {},
+      "parameters": [
+        { "name": "month", "value": "12", "description": "Mês (1-12)" },
+        { "name": "year", "value": "2025", "description": "Ano" }
+      ],
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_reservations_list",
+      "parentId": "fld_reservations",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "url": "{{ _.base_url }}/api/reservations",
+      "name": "GET /reservations",
+      "description": "Listar todas as reservas (Porteiro/Zelador/Síndico)",
+      "method": "GET",
+      "body": {},
+      "parameters": [
+        { "name": "status", "value": "", "description": "pendente, aprovada, rejeitada, cancelada" }
+      ],
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_reservations_pending",
+      "parentId": "fld_reservations",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "url": "{{ _.base_url }}/api/reservations/pending",
+      "name": "GET /reservations/pending",
+      "description": "Listar reservas pendentes de aprovação",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_reservations_my",
+      "parentId": "fld_reservations",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "url": "{{ _.base_url }}/api/reservations/my",
+      "name": "GET /reservations/my",
+      "description": "Listar minhas reservas (Morador)",
+      "method": "GET",
+      "body": {},
+      "parameters": [
+        { "name": "status", "value": "", "description": "pendente, aprovada, rejeitada, cancelada" }
+      ],
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_reservations_detail",
+      "parentId": "fld_reservations",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "url": "{{ _.base_url }}/api/reservations/:id",
+      "name": "GET /reservations/:id",
+      "description": "Obter detalhes de uma reserva",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_reservations_create",
+      "parentId": "fld_reservations",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "url": "{{ _.base_url }}/api/reservations",
+      "name": "POST /reservations",
+      "description": "Criar reserva - Envia push para gestores",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"areaId\": \"area_id_here\",\n  \"date\": \"2025-12-15\",\n  \"timeSlot\": \"18:00-22:00\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_reservations_approve",
+      "parentId": "fld_reservations",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "url": "{{ _.base_url }}/api/reservations/:id/approve",
+      "name": "PUT /reservations/:id/approve",
+      "description": "Aprovar reserva - Envia push para morador",
+      "method": "PUT",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_reservations_reject",
+      "parentId": "fld_reservations",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "url": "{{ _.base_url }}/api/reservations/:id/reject",
+      "name": "PUT /reservations/:id/reject",
+      "description": "Rejeitar reserva - Envia push para morador",
+      "method": "PUT",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"reason\": \"Área em manutenção nesta data\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_reservations_cancel",
+      "parentId": "fld_reservations",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "url": "{{ _.base_url }}/api/reservations/:id",
+      "name": "DELETE /reservations/:id",
+      "description": "Cancelar reserva",
+      "method": "DELETE",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_announcements_list",
+      "parentId": "fld_announcements",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "url": "{{ _.base_url }}/api/announcements",
+      "name": "GET /announcements",
+      "description": "Listar comunicados",
+      "method": "GET",
+      "body": {},
+      "parameters": [
+        { "name": "category", "value": "", "description": "Filtrar por categoria" },
+        { "name": "priority", "value": "", "description": "true para apenas prioridades" }
+      ],
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_announcements_create",
+      "parentId": "fld_announcements",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "url": "{{ _.base_url }}/api/announcements",
+      "name": "POST /announcements",
+      "description": "Criar comunicado - Envia push para todos (exceto criador)",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"title\": \"Reunião de Condomínio\",\n  \"description\": \"Reunião extraordinária no dia 15/12 às 19h na área comum.\",\n  \"photo\": \"https://example.com/photo.jpg\",\n  \"target\": \"all\",\n  \"priority\": true,\n  \"category\": \"geral\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_announcements_detail",
+      "parentId": "fld_announcements",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "url": "{{ _.base_url }}/api/announcements/:id",
+      "name": "GET /announcements/:id",
+      "description": "Obter detalhes de um comunicado",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_visitors_list",
+      "parentId": "fld_visitors",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "url": "{{ _.base_url }}/api/visitors",
+      "name": "GET /visitors",
+      "description": "Listar visitantes",
+      "method": "GET",
+      "body": {},
+      "parameters": [
+        { "name": "date", "value": "", "description": "Filtrar por data (YYYY-MM-DD)" },
+        { "name": "status", "value": "", "description": "pendente, liberado, saida" }
+      ],
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_visitors_create",
+      "parentId": "fld_visitors",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "url": "{{ _.base_url }}/api/visitors",
+      "name": "POST /visitors",
+      "description": "Registrar visitante (Morador)",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Maria Silva\",\n  \"cpf\": \"12345678900\",\n  \"reason\": \"Visita familiar\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_visitors_entry",
+      "parentId": "fld_visitors",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "url": "{{ _.base_url }}/api/visitors/:id/entrada",
+      "name": "PUT /visitors/:id/entrada",
+      "description": "Liberar entrada do visitante (Porteiro)",
+      "method": "PUT",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_visitors_exit",
+      "parentId": "fld_visitors",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "url": "{{ _.base_url }}/api/visitors/:id/saida",
+      "name": "PUT /visitors/:id/saida",
+      "description": "Registrar saída do visitante (Porteiro)",
+      "method": "PUT",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_documents_list",
+      "parentId": "fld_documents",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "url": "{{ _.base_url }}/api/documents",
+      "name": "GET /documents",
+      "description": "Listar documentos/regras do condomínio",
+      "method": "GET",
+      "body": {},
+      "parameters": [
+        { "name": "type", "value": "", "description": "document ou rule" }
+      ],
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_documents_create",
+      "parentId": "fld_documents",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "url": "{{ _.base_url }}/api/documents",
+      "name": "POST /documents",
+      "description": "Criar documento/regra (Síndico) - Envia push para todos",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"title\": \"Regulamento Interno\",\n  \"type\": \"rule\",\n  \"fileUrl\": \"https://cloudinary.com/zelou/rules/regulamento.pdf\",\n  \"fileName\": \"regulamento.pdf\",\n  \"mimeType\": \"application/pdf\",\n  \"fileSize\": 1024000\n}"
+      },
+      "parameters": [],
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_documents_delete",
+      "parentId": "fld_documents",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "url": "{{ _.base_url }}/api/documents/:id",
+      "name": "DELETE /documents/:id",
+      "description": "Remover documento (Síndico)",
+      "method": "DELETE",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_upload_base64",
+      "parentId": "fld_upload",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "url": "{{ _.base_url }}/api/upload/base64",
+      "name": "POST /upload/base64",
+      "description": "Upload de arquivo via base64 para Cloudinary",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"base64\": \"data:application/pdf;base64,JVBERi0xLj...\",\n  \"fileName\": \"documento.pdf\",\n  \"type\": \"document\",\n  \"mimeType\": \"application/pdf\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_notifications_list",
+      "parentId": "fld_notifications",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "url": "{{ _.base_url }}/api/notifications",
+      "name": "GET /notifications",
+      "description": "Listar notificações do usuário",
+      "method": "GET",
+      "body": {},
+      "parameters": [
+        { "name": "page", "value": "1", "description": "Página" },
+        { "name": "limit", "value": "20", "description": "Limite por página" },
+        { "name": "unreadOnly", "value": "", "description": "true para apenas não lidas" }
+      ],
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_notifications_unread_count",
+      "parentId": "fld_notifications",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "url": "{{ _.base_url }}/api/notifications/unread-count",
+      "name": "GET /notifications/unread-count",
+      "description": "Contar notificações não lidas",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_notifications_mark_read",
+      "parentId": "fld_notifications",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "url": "{{ _.base_url }}/api/notifications/:id/read",
+      "name": "PUT /notifications/:id/read",
+      "description": "Marcar notificação como lida",
+      "method": "PUT",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_notifications_mark_all_read",
+      "parentId": "fld_notifications",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "url": "{{ _.base_url }}/api/notifications/read-all",
+      "name": "PUT /notifications/read-all",
+      "description": "Marcar todas as notificações como lidas",
+      "method": "PUT",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_notifications_delete",
+      "parentId": "fld_notifications",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "url": "{{ _.base_url }}/api/notifications/:id",
+      "name": "DELETE /notifications/:id",
+      "description": "Excluir uma notificação",
+      "method": "DELETE",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_notifications_delete_all",
+      "parentId": "fld_notifications",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "url": "{{ _.base_url }}/api/notifications",
+      "name": "DELETE /notifications",
+      "description": "Excluir todas as notificações",
+      "method": "DELETE",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.token }}" }
+      ],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "req_health",
+      "parentId": "wrk_main",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "url": "{{ _.base_url }}/api/health",
+      "name": "GET /health",
+      "description": "Health check da API",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "_type": "request"
+    },
+    {
+      "_id": "fld_auth",
+      "parentId": "wrk_main",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "name": "🔐 Autenticação",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": 1000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_condominiums",
+      "parentId": "wrk_main",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "name": "🏢 Condomínios",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": 1500,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_users",
+      "parentId": "wrk_main",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "name": "👥 Usuários",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": 1600,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_deliveries",
+      "parentId": "wrk_main",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "name": "📦 Entregas",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": 2000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_reports",
+      "parentId": "wrk_main",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "name": "🛠️ Irregularidades",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": 3000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_areas",
+      "parentId": "wrk_main",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "name": "🏊 Áreas Comuns",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": 4000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_reservations",
+      "parentId": "wrk_main",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "name": "📅 Reservas",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": 5000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_announcements",
+      "parentId": "wrk_main",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "name": "📢 Comunicados",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": 6000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_visitors",
+      "parentId": "wrk_main",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "name": "🚪 Visitantes",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": 7000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_documents",
+      "parentId": "wrk_main",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "name": "📄 Documentos",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": 8000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_upload",
+      "parentId": "wrk_main",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "name": "☁️ Upload",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": 8500,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_notifications",
+      "parentId": "wrk_main",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "name": "🔔 Notificações",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": 9000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "wrk_main",
+      "parentId": null,
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "name": "Zelou API",
+      "description": "API completa para gestão de condomínio",
+      "scope": "collection",
+      "_type": "workspace"
+    },
+    {
+      "_id": "env_base",
+      "parentId": "wrk_main",
+      "modified": 1704808800000,
+      "created": 1704808800000,
+      "name": "Base Environment",
+      "data": {
+        "base_url": "http://localhost:3000",
+        "token": "cole_seu_token_aqui"
+      },
+      "dataPropertyOrder": {
+        "&": ["base_url", "token"]
+      },
+      "color": null,
+      "isPrivate": false,
+      "metaSortKey": 1704808800000,
+      "_type": "environment"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "2178266820",
+    "project_id": "zelou-99e14",
+    "storage_bucket": "zelou-99e14.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:2178266820:android:9212b98413047da3577b91",
+        "android_client_info": {
+          "package_name": "com.zelou.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCD1zOjg59wAD6_59VOdYBT8umajw1uHSo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
