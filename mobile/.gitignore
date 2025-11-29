@@ -11,5 +11,15 @@ npm-debug.*
 *.orig.*
 web-build/
 
+# Firebase credentials (nunca subir para o Git!)
+firebase-service-account.json
+google-services.json
+GoogleService-Info.plist
+
+# Environment files
+.env
+.env.local
+.env.production
+
 
 
