@@ -11,17 +11,20 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../../contexts/AuthContext';
+import { useTheme } from '../../contexts/ThemeContext';
 import { deliveriesApi, Delivery } from '../../api/deliveries';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Animated, { FadeInDown } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
+import { getListItemAnimation } from '../../utils/animations';
 
 const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
 
 const DeliveriesScreen = () => {
   const navigation = useNavigation();
   const { user } = useAuth();
+  const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const [deliveries, setDeliveries] = useState<Delivery[]>([]);
   const [loading, setLoading] = useState(false);
@@ -48,26 +51,28 @@ const DeliveriesScreen = () => {
 
   const renderItem = ({ item, index }: { item: Delivery; index: number }) => (
     <AnimatedTouchableOpacity
-      entering={FadeInDown.delay(index * 30).springify().damping(15)}
-      style={styles.card}
+      entering={getListItemAnimation(index)}
+      style={[styles.card, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}
       onPress={() => navigation.navigate('DeliveryDetail' as never, { deliveryId: item._id } as never)}
       activeOpacity={0.7}
     >
       <Image source={{ uri: item.photoUrl }} style={styles.photo} />
       <View style={styles.cardContent}>
         <View style={styles.cardHeader}>
-          <Text style={styles.residentName} numberOfLines={1}>
+          <Text style={[styles.residentName, { color: colors.text }]} numberOfLines={1}>
             {item.residentId?.name || 'Morador não encontrado'}
           </Text>
           <View
             style={[
               styles.statusBadge,
-              item.status === 'retirada' ? styles.statusRetrieved : styles.statusPending,
+              item.status === 'retirada' 
+                ? { backgroundColor: colors.successBackground } 
+                : { backgroundColor: colors.warningBackground },
             ]}
           >
             <Text style={[
               styles.statusText,
-              item.status === 'retirada' ? styles.statusTextRetrieved : styles.statusTextPending
+              { color: item.status === 'retirada' ? colors.success : colors.warning }
             ]}>
               {item.status === 'retirada' ? 'Retirada' : 'Pendente'}
             </Text>
@@ -75,20 +80,20 @@ const DeliveriesScreen = () => {
         </View>
         <View style={styles.cardDetails}>
           <View style={styles.detailRow}>
-            <Ionicons name="location-outline" size={14} color="#64748B" />
-            <Text style={styles.unit}>
-              Bloco {item.residentId?.unit?.block || '-'} • Apt {item.residentId?.unit?.number || '-'}
+            <Ionicons name="location-outline" size={14} color={colors.textSecondary} />
+            <Text style={[styles.unit, { color: colors.textSecondary }]}>
+              {item.residentId?.unit?.block ? `Bloco ${item.residentId.unit.block} • ` : ''}Apt {item.residentId?.unit?.number || '-'}
             </Text>
           </View>
           {item.packageType && (
             <View style={styles.detailRow}>
-              <Ionicons name="cube-outline" size={14} color="#64748B" />
-              <Text style={styles.packageType}>{item.packageType}</Text>
+              <Ionicons name="cube-outline" size={14} color={colors.textSecondary} />
+              <Text style={[styles.packageType, { color: colors.textSecondary }]}>{item.packageType}</Text>
             </View>
           )}
         </View>
       </View>
-      <Ionicons name="chevron-forward" size={20} color="#CBD5E1" style={styles.chevron} />
+      <Ionicons name="chevron-forward" size={20} color={colors.textTertiary} style={styles.chevron} />
     </AnimatedTouchableOpacity>
   );
 
@@ -96,9 +101,9 @@ const DeliveriesScreen = () => {
   const pendingCount = deliveries.filter(d => d.status === 'pendente').length;
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <LinearGradient
-        colors={['#6366F1', '#8B5CF6', '#A855F7']}
+        colors={[colors.headerGradientStart, colors.headerGradientMiddle, colors.headerGradientEnd]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={[styles.header, { paddingTop: insets.top + 16 }]}
@@ -120,31 +125,43 @@ const DeliveriesScreen = () => {
         </View>
       </LinearGradient>
 
-      <View style={styles.filtersContainer}>
+      <View style={[styles.filtersContainer, { backgroundColor: colors.card, borderBottomColor: colors.border }]}>
         <TouchableOpacity
-          style={[styles.filterButton, filter === 'all' && styles.filterButtonActive]}
+          style={[
+            styles.filterButton, 
+            { backgroundColor: colors.backgroundTertiary, borderColor: colors.border },
+            filter === 'all' && { backgroundColor: colors.primary, borderColor: colors.primary }
+          ]}
           onPress={() => setFilter('all')}
           activeOpacity={0.7}
         >
-          <Text style={[styles.filterText, filter === 'all' && styles.filterTextActive]}>
+          <Text style={[styles.filterText, { color: colors.textSecondary }, filter === 'all' && { color: '#FFFFFF' }]}>
             Todas
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.filterButton, filter === 'pendente' && styles.filterButtonActive]}
+          style={[
+            styles.filterButton, 
+            { backgroundColor: colors.backgroundTertiary, borderColor: colors.border },
+            filter === 'pendente' && { backgroundColor: colors.primary, borderColor: colors.primary }
+          ]}
           onPress={() => setFilter('pendente')}
           activeOpacity={0.7}
         >
-          <Text style={[styles.filterText, filter === 'pendente' && styles.filterTextActive]}>
+          <Text style={[styles.filterText, { color: colors.textSecondary }, filter === 'pendente' && { color: '#FFFFFF' }]}>
             Pendentes
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.filterButton, filter === 'retirada' && styles.filterButtonActive]}
+          style={[
+            styles.filterButton, 
+            { backgroundColor: colors.backgroundTertiary, borderColor: colors.border },
+            filter === 'retirada' && { backgroundColor: colors.primary, borderColor: colors.primary }
+          ]}
           onPress={() => setFilter('retirada')}
           activeOpacity={0.7}
         >
-          <Text style={[styles.filterText, filter === 'retirada' && styles.filterTextActive]}>
+          <Text style={[styles.filterText, { color: colors.textSecondary }, filter === 'retirada' && { color: '#FFFFFF' }]}>
             Retiradas
           </Text>
         </TouchableOpacity>
@@ -158,15 +175,15 @@ const DeliveriesScreen = () => {
           <RefreshControl 
             refreshing={loading} 
             onRefresh={loadDeliveries}
-            tintColor="#6366F1"
-            colors={['#6366F1']}
+            tintColor={colors.primary}
+            colors={[colors.primary]}
           />
         }
         contentContainerStyle={styles.list}
         ListEmptyComponent={
           <View style={styles.empty}>
-            <Ionicons name="cube-outline" size={64} color="#CBD5E1" />
-            <Text style={styles.emptyText}>Nenhuma entrega encontrada</Text>
+            <Ionicons name="cube-outline" size={64} color={colors.textTertiary} />
+            <Text style={[styles.emptyText, { color: colors.textSecondary }]}>Nenhuma entrega encontrada</Text>
           </View>
         }
       />

@@ -13,7 +13,7 @@ import {
 import { useNavigation, useRoute } from '@react-navigation/native';
 import * as DocumentPicker from 'expo-document-picker';
 import { documentsApi } from '../../api/documents';
-import { uploadFile } from '../../api/upload';
+import { uploadFileWithDetails } from '../../api/upload';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import GradientHeader from '../../components/GradientHeader';
@@ -70,7 +70,7 @@ const CreateDocumentScreen = () => {
     try {
       // 1. Fazer upload do arquivo para o Cloudinary
       setUploadProgress('Enviando arquivo...');
-      const uploadResult = await uploadFile(
+      const uploadResult = await uploadFileWithDetails(
         selectedFile.uri,
         selectedFile.name,
         documentType as 'document' | 'rule',

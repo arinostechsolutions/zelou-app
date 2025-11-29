@@ -27,6 +27,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   register: (data: any) => Promise<void>;
   logout: () => Promise<void>;
+  updateUser: (userData: any) => Promise<void>;
   isAuthenticated: boolean;
 }
 
@@ -58,20 +59,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const syncPushToken = async (currentPushToken: string | null) => {
+  const syncPushToken = async (currentPushToken: string | null, forceUpdate: boolean = false) => {
     try {
-      // Se o pushToken já existe no backend, não precisa pedir permissão novamente
-      if (currentPushToken) {
-        console.log('Push token já existe no backend:', currentPushToken);
+      // Obtém o token do dispositivo atual
+      const deviceToken = await registerForPushNotificationsAsync();
+      
+      if (!deviceToken) {
+        console.log('Não foi possível obter push token do dispositivo');
         return;
       }
 
-      // Se não tem pushToken, pede permissão e registra
-      console.log('Push token não encontrado, solicitando permissão...');
-      const expoToken = await registerForPushNotificationsAsync();
-      if (expoToken) {
-        await usersApi.updatePushToken(expoToken);
-        console.log('Push token registrado com sucesso:', expoToken);
+      // Se o token do backend é diferente do dispositivo, ou forceUpdate, atualiza
+      if (forceUpdate || currentPushToken !== deviceToken) {
+        await usersApi.updatePushToken(deviceToken);
+        console.log('Push token atualizado com sucesso:', deviceToken);
+      } else {
+        console.log('Push token já está atualizado:', deviceToken);
       }
     } catch (error) {
       console.warn('Não foi possível sincronizar o push token', error);
@@ -89,8 +92,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(data.user);
     hasSyncedPushToken.current = false;
     
-    // Verifica se precisa pedir permissão de notificação
-    syncPushToken(data.user.pushToken);
+    // Sempre atualiza o push token ao fazer login (garante que o token é do usuário correto)
+    syncPushToken(data.user.pushToken, true);
   };
 
   const register = async (data: any) => {
@@ -104,16 +107,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(authData.user);
     hasSyncedPushToken.current = false;
     
-    // Verifica se precisa pedir permissão de notificação
-    syncPushToken(authData.user.pushToken);
+    // Sempre atualiza o push token ao registrar
+    syncPushToken(authData.user.pushToken, true);
   };
 
   const logout = async () => {
+    try {
+      // Limpar o push token do usuário no backend antes de deslogar
+      await usersApi.updatePushToken('');
+      console.log('Push token removido do usuário');
+    } catch (error) {
+      console.warn('Erro ao remover push token:', error);
+    }
+    
     await AsyncStorage.removeItem('token');
     await AsyncStorage.removeItem('user');
     setToken(null);
     setUser(null);
     hasSyncedPushToken.current = false;
+  };
+
+  const updateUser = async (userData: any) => {
+    const updatedUser = {
+      ...user,
+      ...userData,
+      id: userData._id || userData.id || user?.id,
+    };
+    setUser(updatedUser);
+    await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
   };
 
   // Quando o app é reaberto com usuário já logado, busca dados atualizados do backend
@@ -149,6 +170,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         login,
         register,
         logout,
+        updateUser,
         isAuthenticated: !!token && !!user,
       }}
     >

@@ -81,10 +81,7 @@ const EditUserScreen = () => {
       Alert.alert('Erro', 'Por favor, informe o telefone.');
       return;
     }
-    if (!block.trim()) {
-      Alert.alert('Erro', 'Por favor, informe o bloco.');
-      return;
-    }
+    // Bloco é opcional - alguns condomínios não têm blocos/torres
     if (!unitNumber.trim()) {
       Alert.alert('Erro', 'Por favor, informe o número da unidade.');
       return;
@@ -99,7 +96,7 @@ const EditUserScreen = () => {
         phone: phone.trim(),
         role,
         unit: {
-          block: block.trim(),
+          block: block.trim() || undefined,  // Opcional
           number: unitNumber.trim(),
         },
       };

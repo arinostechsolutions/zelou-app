@@ -6,23 +6,25 @@ import {
   TouchableOpacity,
   StyleSheet,
   RefreshControl,
-  Image,
   Platform,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../../contexts/AuthContext';
+import { useTheme } from '../../contexts/ThemeContext';
 import { reportsApi, Report } from '../../api/reports';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import Animated, { FadeInDown } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import GradientHeader from '../../components/GradientHeader';
 import { formatDate } from '../../utils/dateFormat';
+import { getListItemAnimation } from '../../utils/animations';
 
 const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
 
 const ReportsScreen = () => {
   const navigation = useNavigation();
   const { user } = useAuth();
+  const { colors } = useTheme();
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState<'all' | 'aberta' | 'andamento' | 'concluida'>('all');
@@ -81,35 +83,17 @@ const ReportsScreen = () => {
 
   const renderItem = ({ item, index }: { item: Report; index: number }) => (
     <AnimatedTouchableOpacity
-      entering={FadeInDown.delay(index * 50).springify().damping(15)}
-      style={styles.card}
+      entering={getListItemAnimation(index, 50)}
+      style={[styles.card, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}
       onPress={() => navigation.navigate('ReportDetail' as never, { reportId: item._id } as never)}
       activeOpacity={0.7}
     >
-      {item.photos && item.photos.length > 0 && (
-        <Image source={{ uri: item.photos[0] }} style={styles.photo} />
-      )}
       <View style={styles.cardContent}>
         <View style={styles.cardHeader}>
-          <View style={styles.categoryBadge}>
-            <Ionicons name="warning-outline" size={14} color="#F59E0B" />
-            <Text style={styles.categoryText}>{item.category}</Text>
+          <View style={[styles.categoryBadge, { backgroundColor: colors.warningBackground }]}>
+            <Ionicons name="warning-outline" size={14} color={colors.warning} />
+            <Text style={[styles.categoryText, { color: colors.warning }]}>{item.category}</Text>
           </View>
-          <Text style={styles.date}>
-            {formatDate(item.createdAt)}
-          </Text>
-        </View>
-        
-        <View style={styles.locationRow}>
-          <Ionicons name="location-outline" size={16} color="#64748B" />
-          <Text style={styles.location}>{item.location}</Text>
-        </View>
-        
-        <Text style={styles.description} numberOfLines={2}>
-          {item.description}
-        </Text>
-        
-        <View style={styles.footer}>
           <View style={[styles.statusBadge, { backgroundColor: `${getStatusColor(item.status)}15` }]}>
             <View style={[styles.statusDot, { backgroundColor: getStatusColor(item.status) }]} />
             <Text style={[styles.statusText, { color: getStatusColor(item.status) }]}>
@@ -117,12 +101,34 @@ const ReportsScreen = () => {
             </Text>
           </View>
         </View>
+        
+        <View style={styles.locationRow}>
+          <Ionicons name="location-outline" size={16} color={colors.textSecondary} />
+          <Text style={[styles.location, { color: colors.textSecondary }]}>{item.location}</Text>
+        </View>
+        
+        <Text style={[styles.description, { color: colors.text }]} numberOfLines={2}>
+          {item.description}
+        </Text>
+        
+        <View style={styles.footer}>
+          <Text style={[styles.date, { color: colors.textTertiary }]}>
+            {formatDate(item.createdAt)}
+          </Text>
+          {item.photos && item.photos.length > 0 && (
+            <View style={styles.photosIndicator}>
+              <Ionicons name="images-outline" size={14} color={colors.textSecondary} />
+              <Text style={[styles.photosIndicatorText, { color: colors.textSecondary }]}>{item.photos.length} foto(s)</Text>
+            </View>
+          )}
+        </View>
       </View>
+      <Ionicons name="chevron-forward" size={20} color={colors.textTertiary} style={styles.chevron} />
     </AnimatedTouchableOpacity>
   );
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <GradientHeader
         title="Irregularidades"
         subtitle={`${reports.length} ocorrências`}
@@ -130,20 +136,22 @@ const ReportsScreen = () => {
       />
 
       {/* Filtros */}
-      <View style={styles.filtersContainer}>
+      <View style={[styles.filtersContainer, { backgroundColor: colors.card, borderBottomColor: colors.border }]}>
         {filters.map((f) => (
           <TouchableOpacity
             key={f.key}
             style={[
               styles.filterButton,
-              filter === f.key && styles.filterButtonActive
+              { backgroundColor: colors.backgroundTertiary, borderColor: colors.border },
+              filter === f.key && { backgroundColor: colors.primary, borderColor: colors.primary }
             ]}
             onPress={() => setFilter(f.key as any)}
             activeOpacity={0.7}
           >
             <Text style={[
               styles.filterText,
-              filter === f.key && styles.filterTextActive
+              { color: colors.textSecondary },
+              filter === f.key && { color: '#FFFFFF' }
             ]}>
               {f.label}
             </Text>
@@ -159,16 +167,16 @@ const ReportsScreen = () => {
           <RefreshControl 
             refreshing={loading} 
             onRefresh={loadReports}
-            tintColor="#6366F1"
-            colors={['#6366F1']}
+            tintColor={colors.primary}
+            colors={[colors.primary]}
           />
         }
         contentContainerStyle={styles.list}
         ListEmptyComponent={
           <View style={styles.empty}>
-            <Ionicons name="checkmark-circle-outline" size={64} color="#CBD5E1" />
-            <Text style={styles.emptyText}>Nenhuma irregularidade</Text>
-            <Text style={styles.emptySubtext}>
+            <Ionicons name="checkmark-circle-outline" size={64} color={colors.textTertiary} />
+            <Text style={[styles.emptyText, { color: colors.textSecondary }]}>Nenhuma irregularidade</Text>
+            <Text style={[styles.emptySubtext, { color: colors.textTertiary }]}>
               {filter !== 'all' ? 'Tente mudar o filtro' : 'Tudo em ordem por aqui!'}
             </Text>
           </View>
@@ -238,7 +246,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 16,
     marginBottom: 12,
-    overflow: 'hidden',
+    flexDirection: 'row',
+    alignItems: 'center',
     borderWidth: 2,
     borderColor: '#E2E8F0',
     ...Platform.select({
@@ -253,12 +262,11 @@ const styles = StyleSheet.create({
       },
     }),
   },
-  photo: {
-    width: '100%',
-    height: 160,
-    backgroundColor: '#F1F5F9',
+  chevron: {
+    marginRight: 12,
   },
   cardContent: {
+    flex: 1,
     padding: 16,
   },
   cardHeader: {
@@ -266,6 +274,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 10,
+    flexWrap: 'wrap',
+    gap: 8,
   },
   categoryBadge: {
     flexDirection: 'row',
@@ -303,7 +313,18 @@ const styles = StyleSheet.create({
   },
   footer: {
     flexDirection: 'row',
-    justifyContent: 'flex-start',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  photosIndicator: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  photosIndicatorText: {
+    fontSize: 12,
+    color: '#64748B',
   },
   statusBadge: {
     flexDirection: 'row',

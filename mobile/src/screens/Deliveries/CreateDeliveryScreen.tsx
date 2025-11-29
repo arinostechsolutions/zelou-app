@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -10,16 +10,21 @@ import {
   Image,
   ActivityIndicator,
   Platform,
+  KeyboardAvoidingView,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { deliveriesApi } from '../../api/deliveries';
 import { usersApi, LookupResidentResponse } from '../../api/users';
+import { uploadFile } from '../../api/upload';
 import GradientHeader from '../../components/GradientHeader';
+import { useTheme } from '../../contexts/ThemeContext';
 
 const CreateDeliveryScreen = () => {
   const navigation = useNavigation();
+  const { colors } = useTheme();
+  const scrollViewRef = useRef<ScrollView>(null);
   const [photo, setPhoto] = useState<string | null>(null);
   const [block, setBlock] = useState('');
   const [unitNumber, setUnitNumber] = useState('');
@@ -66,15 +71,15 @@ const CreateDeliveryScreen = () => {
   };
 
   const handleLookupResident = async () => {
-    if (!block.trim() || !unitNumber.trim()) {
-      Alert.alert('Atenção', 'Informe o bloco e o número da unidade.');
+    if (!unitNumber.trim()) {
+      Alert.alert('Atenção', 'Informe o número da unidade.');
       return;
     }
 
     setSearchingResident(true);
     try {
       const data = await usersApi.lookupResident({
-        block: block.trim().toUpperCase(),
+        block: block.trim().toUpperCase() || undefined,  // Opcional
         number: unitNumber.trim(),
       });
       setResident(data);
@@ -92,13 +97,15 @@ const CreateDeliveryScreen = () => {
       return;
     }
 
-    // In a real app, you'd upload the photo to a storage service (S3, Cloudinary, etc.)
-    // For now, we'll use the local URI
     setLoading(true);
     try {
+      // Upload da foto para o Cloudinary
+      const fileName = `delivery_${Date.now()}.jpg`;
+      const photoUrl = await uploadFile(photo, fileName, 'delivery', 'image/jpeg');
+
       await deliveriesApi.create({
         residentId: resident._id,
-        photoUrl: photo, // This should be the uploaded URL in production
+        photoUrl,
         packageType,
         volumeNumber: volumeNumber || undefined,
         notes: notes || undefined,
@@ -106,52 +113,65 @@ const CreateDeliveryScreen = () => {
       Alert.alert('Sucesso', 'Entrega registrada com sucesso');
       navigation.goBack();
     } catch (error: any) {
-      Alert.alert('Erro', error.response?.data?.message || 'Erro ao registrar entrega');
+      console.error('Erro ao criar entrega:', error);
+      Alert.alert('Erro', error.response?.data?.message || error.message || 'Erro ao registrar entrega');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <GradientHeader
         title="Registrar Entrega"
         subtitle="Preencha os dados da encomenda"
         onBackPress={() => navigation.goBack()}
       />
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
+      <KeyboardAvoidingView 
+        style={{ flex: 1 }} 
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+      >
+        <ScrollView 
+          ref={scrollViewRef}
+          style={styles.scrollView} 
+          contentContainerStyle={styles.content}
+          keyboardShouldPersistTaps="handled"
+        >
         <TouchableOpacity style={styles.photoButton} onPress={pickImage}>
           {photo ? (
             <Image source={{ uri: photo }} style={styles.photo} />
           ) : (
-            <View style={styles.photoPlaceholder}>
-              <Text style={styles.photoPlaceholderText}>Tocar para adicionar foto</Text>
+            <View style={[styles.photoPlaceholder, { backgroundColor: colors.inputBackground, borderColor: colors.inputBorder }]}>
+              <Text style={[styles.photoPlaceholderText, { color: colors.placeholder }]}>Tocar para adicionar foto</Text>
             </View>
           )}
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.cameraButton} onPress={takePhoto}>
-          <Text style={styles.cameraButtonText}>Tirar Foto</Text>
+        <TouchableOpacity style={[styles.cameraButton, { backgroundColor: colors.inputBackground, borderColor: colors.inputBorder }]} onPress={takePhoto}>
+          <Text style={[styles.cameraButtonText, { color: colors.primary }]}>Tirar Foto</Text>
         </TouchableOpacity>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Identificar destinatário</Text>
+        <View style={[styles.section, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Identificar destinatário</Text>
           <View style={styles.row}>
             <View style={[styles.formGroup, styles.half]}>
-              <Text style={styles.label}>Bloco</Text>
+              <Text style={[styles.label, { color: colors.textSecondary }]}>Bloco</Text>
               <TextInput
-                style={styles.input}
+                style={[styles.input, { backgroundColor: colors.inputBackground, borderColor: colors.inputBorder, color: colors.inputText }]}
                 placeholder="Ex: A"
+                placeholderTextColor={colors.placeholder}
                 autoCapitalize="characters"
                 value={block}
                 onChangeText={setBlock}
               />
             </View>
             <View style={[styles.formGroup, styles.half]}>
-              <Text style={styles.label}>Unidade</Text>
+              <Text style={[styles.label, { color: colors.textSecondary }]}>Unidade</Text>
               <TextInput
-                style={styles.input}
+                style={[styles.input, { backgroundColor: colors.inputBackground, borderColor: colors.inputBorder, color: colors.inputText }]}
                 placeholder="Ex: 101"
+                placeholderTextColor={colors.placeholder}
                 value={unitNumber}
                 onChangeText={setUnitNumber}
                 keyboardType="numeric"
@@ -172,50 +192,58 @@ const CreateDeliveryScreen = () => {
           </TouchableOpacity>
 
           {resident ? (
-            <View style={styles.residentCard}>
+            <View style={[styles.residentCard, { backgroundColor: colors.successBackground, borderColor: colors.success }]}>
               <View style={styles.residentHeader}>
                 <View>
-                  <Text style={styles.residentName}>{resident.name}</Text>
-                  <Text style={styles.residentInfo}>
-                    Bloco {resident.unit.block} · Unidade {resident.unit.number}
+                  <Text style={[styles.residentName, { color: colors.text }]}>{resident.name}</Text>
+                  <Text style={[styles.residentInfo, { color: colors.textSecondary }]}>
+                    {resident.unit.block ? `Bloco ${resident.unit.block} · ` : ''}Unidade {resident.unit.number}
                   </Text>
-                  <Text style={styles.residentInfo}>{resident.email}</Text>
-                  <Text style={styles.residentInfo}>{resident.phone}</Text>
+                  <Text style={[styles.residentInfo, { color: colors.textSecondary }]}>{resident.email}</Text>
+                  <Text style={[styles.residentInfo, { color: colors.textSecondary }]}>{resident.phone}</Text>
                 </View>
                 <TouchableOpacity onPress={() => setResident(null)}>
-                  <Ionicons name="close" size={20} color="#94A3B8" />
+                  <Ionicons name="close" size={20} color={colors.textTertiary} />
                 </TouchableOpacity>
               </View>
             </View>
           ) : (
-            <Text style={styles.helperText}>
+            <Text style={[styles.helperText, { color: colors.textTertiary }]}>
               Informe o bloco e a unidade para localizar automaticamente o morador.
             </Text>
           )}
         </View>
 
         <TextInput
-          style={styles.input}
+          style={[styles.input, { backgroundColor: colors.inputBackground, borderColor: colors.inputBorder, color: colors.inputText }]}
           placeholder="Tipo de encomenda"
+          placeholderTextColor={colors.placeholder}
           value={packageType}
           onChangeText={setPackageType}
         />
 
         <TextInput
-          style={styles.input}
+          style={[styles.input, { backgroundColor: colors.inputBackground, borderColor: colors.inputBorder, color: colors.inputText }]}
           placeholder="Número de volumes (opcional)"
+          placeholderTextColor={colors.placeholder}
           value={volumeNumber}
           onChangeText={setVolumeNumber}
           keyboardType="numeric"
         />
 
         <TextInput
-          style={[styles.input, styles.textArea]}
+          style={[styles.input, styles.textArea, { backgroundColor: colors.inputBackground, borderColor: colors.inputBorder, color: colors.inputText }]}
           placeholder="Observações (opcional)"
+          placeholderTextColor={colors.placeholder}
           value={notes}
           onChangeText={setNotes}
           multiline
           numberOfLines={4}
+          onFocus={() => {
+            setTimeout(() => {
+              scrollViewRef.current?.scrollToEnd({ animated: true });
+            }, 300);
+          }}
         />
 
         <TouchableOpacity
@@ -227,7 +255,8 @@ const CreateDeliveryScreen = () => {
             {loading ? 'Registrando...' : 'Registrar Entrega'}
           </Text>
         </TouchableOpacity>
-      </ScrollView>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </View>
   );
 };
@@ -255,27 +284,22 @@ const styles = StyleSheet.create({
   photoPlaceholder: {
     width: '100%',
     height: 200,
-    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#E2E8F0',
     borderStyle: 'dashed',
   },
   photoPlaceholderText: {
-    color: '#94A3B8',
     fontSize: 16,
     fontWeight: '500',
   },
   cameraButton: {
-    backgroundColor: '#FFFFFF',
     padding: 14,
     borderRadius: 12,
     alignItems: 'center',
     marginBottom: 20,
     borderWidth: 2,
-    borderColor: '#E2E8F0',
     ...Platform.select({
       ios: {
         shadowColor: '#000',
@@ -289,30 +313,25 @@ const styles = StyleSheet.create({
     }),
   },
   cameraButtonText: {
-    color: '#6366F1',
     fontSize: 16,
     fontWeight: '600',
   },
   input: {
     borderWidth: 2,
-    borderColor: '#E2E8F0',
     borderRadius: 12,
     padding: 16,
     fontSize: 16,
     marginBottom: 16,
-    backgroundColor: '#FFFFFF',
   },
   textArea: {
     height: 100,
     textAlignVertical: 'top',
   },
   section: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 16,
     marginBottom: 16,
     borderWidth: 2,
-    borderColor: '#E2E8F0',
     ...Platform.select({
       ios: {
         shadowColor: '#000',
@@ -329,7 +348,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     marginBottom: 12,
-    color: '#1E293B',
   },
   row: {
     flexDirection: 'row',
@@ -372,10 +390,8 @@ const styles = StyleSheet.create({
   },
   residentCard: {
     borderWidth: 2,
-    borderColor: '#10B981',
     borderRadius: 12,
     padding: 16,
-    backgroundColor: '#F0FDF4',
   },
   residentHeader: {
     flexDirection: 'row',

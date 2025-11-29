@@ -12,10 +12,11 @@ import {
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import Animated, { FadeInDown } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import { condominiumsApi, Condominium } from '../../api/condominiums';
 import { usersApi, User } from '../../api/users';
 import GradientHeader from '../../components/GradientHeader';
+import { getListItemAnimation } from '../../utils/animations';
 
 const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
 
@@ -124,7 +125,7 @@ const CondominiumDetailScreen = () => {
           <Text style={styles.sectionTitle}>Ações</Text>
           <View style={styles.actionsGrid}>
             <AnimatedTouchableOpacity
-              entering={FadeInDown.delay(50).springify()}
+              entering={getListItemAnimation(0, 50)}
               style={styles.actionButton}
               onPress={() =>
                 navigation.navigate('CreateUser' as never, { condominiumId: id } as never)
@@ -137,7 +138,7 @@ const CondominiumDetailScreen = () => {
             </AnimatedTouchableOpacity>
 
             <AnimatedTouchableOpacity
-              entering={FadeInDown.delay(100).springify()}
+              entering={getListItemAnimation(1, 50)}
               style={styles.actionButton}
               onPress={() =>
                 navigation.navigate('InviteCodes' as never, { condominiumId: id } as never)
@@ -150,7 +151,7 @@ const CondominiumDetailScreen = () => {
             </AnimatedTouchableOpacity>
 
             <AnimatedTouchableOpacity
-              entering={FadeInDown.delay(150).springify()}
+              entering={getListItemAnimation(2, 50)}
               style={styles.actionButton}
               onPress={() =>
                 navigation.navigate('EditCondominium' as never, { id } as never)
@@ -185,7 +186,7 @@ const CondominiumDetailScreen = () => {
               {roleUsers.map((user, index) => (
                 <AnimatedTouchableOpacity
                   key={user._id}
-                  entering={FadeInDown.delay(index * 30).springify()}
+                  entering={getListItemAnimation(index)}
                   style={styles.userCard}
                   onPress={() =>
                     navigation.navigate('UserDetail' as never, { userId: user._id } as never)
@@ -194,7 +195,7 @@ const CondominiumDetailScreen = () => {
                   <View style={styles.userInfo}>
                     <Text style={styles.userName}>{user.name}</Text>
                     <Text style={styles.userUnit}>
-                      {user.unit.block} - {user.unit.number}
+                      {user.unit.block ? `${user.unit.block} - ` : ''}{user.unit.number}
                     </Text>
                   </View>
                   <Ionicons name="chevron-forward" size={20} color="#CBD5E1" />

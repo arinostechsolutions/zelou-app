@@ -15,17 +15,20 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { reservationsApi, Reservation } from '../../api/reservations';
 import { useAuth } from '../../contexts/AuthContext';
+import { useTheme } from '../../contexts/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Animated, { FadeInDown } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import { formatDateLong } from '../../utils/dateFormat';
+import { getListItemAnimation } from '../../utils/animations';
 
 const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
 
 const ReservationsScreen = () => {
   const navigation = useNavigation();
   const { user } = useAuth();
+  const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(false);
@@ -39,6 +42,9 @@ const ReservationsScreen = () => {
 
   // Verificar se é porteiro/zelador/sindico
   const canApprove = user?.role === 'porteiro' || user?.role === 'zelador' || user?.role === 'sindico';
+  
+  // Verificar se pode exportar relatórios (apenas síndico e master)
+  const canExportReport = user?.role === 'sindico' || user?.isMasterAdmin;
 
   const loadReservations = async () => {
     setLoading(true);
@@ -155,14 +161,14 @@ const ReservationsScreen = () => {
 
   const getUserUnit = (userId: Reservation['userId']) => {
     if (typeof userId === 'string') return '';
-    return `${userId.unit.block} - ${userId.unit.number}`;
+    return userId.unit.block ? `${userId.unit.block} - ${userId.unit.number}` : userId.unit.number;
   };
 
   const pendingCount = reservations.filter(r => r.status === 'pendente').length;
 
   const renderItem = ({ item, index }: { item: Reservation; index: number }) => (
     <AnimatedTouchableOpacity
-      entering={FadeInDown.delay(index * 50).springify().damping(15)}
+      entering={getListItemAnimation(index, 50)}
       style={styles.card}
       onPress={() => navigation.navigate('ReservationDetail' as never, { reservationId: item._id } as never)}
       activeOpacity={0.7}
@@ -243,9 +249,9 @@ const ReservationsScreen = () => {
   );
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <LinearGradient
-        colors={['#6366F1', '#8B5CF6', '#A855F7']}
+        colors={[colors.headerGradientStart, colors.headerGradientMiddle, colors.headerGradientEnd]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={[styles.header, { paddingTop: insets.top + 16 }]}
@@ -267,6 +273,15 @@ const ReservationsScreen = () => {
               {canApprove && pendingCount > 0 && ` • ${pendingCount} pendentes`}
             </Text>
           </View>
+          {canExportReport && (
+            <TouchableOpacity
+              style={styles.reportButton}
+              onPress={() => navigation.navigate('ReservationReport' as never)}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="document-text-outline" size={22} color="#FFFFFF" />
+            </TouchableOpacity>
+          )}
         </View>
       </LinearGradient>
 
@@ -329,8 +344,8 @@ const ReservationsScreen = () => {
         }
       />
 
-      {/* FAB para criar reserva (apenas morador) */}
-      {user?.role === 'morador' && (
+      {/* FAB para criar reserva (morador e síndico) */}
+      {(user?.role === 'morador' || user?.role === 'sindico') && (
         <TouchableOpacity
           style={styles.fab}
           onPress={() => navigation.navigate('CreateReservation' as never)}
@@ -415,6 +430,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
+  },
+  reportButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   headerContent: {
     flex: 1,

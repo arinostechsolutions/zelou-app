@@ -15,6 +15,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { Picker } from '@react-native-picker/picker';
 import { useNavigation } from '@react-navigation/native';
 import { announcementsApi } from '../../api/announcements';
+import { uploadFile } from '../../api/upload';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import GradientHeader from '../../components/GradientHeader';
@@ -45,10 +46,18 @@ const CreateAnnouncementScreen = () => {
 
     setLoading(true);
     try {
+      let photoUrl: string | undefined;
+      
+      // Upload da foto para o Cloudinary se existir
+      if (photo) {
+        const fileName = `announcement_${Date.now()}.jpg`;
+        photoUrl = await uploadFile(photo, fileName, 'announcement', 'image/jpeg');
+      }
+
       await announcementsApi.create({
         title,
         description,
-        photo: photo || undefined,
+        photo: photoUrl,
         target,
         priority,
       });
@@ -56,7 +65,8 @@ const CreateAnnouncementScreen = () => {
         { text: 'OK', onPress: () => navigation.goBack() }
       ]);
     } catch (error: any) {
-      Alert.alert('Erro', error.response?.data?.message || 'Erro ao criar comunicado');
+      console.error('Erro ao criar comunicado:', error);
+      Alert.alert('Erro', error.response?.data?.message || error.message || 'Erro ao criar comunicado');
     } finally {
       setLoading(false);
     }

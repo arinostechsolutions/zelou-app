@@ -12,9 +12,10 @@ import {
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import Animated, { FadeInDown } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import { usersApi, User } from '../../api/users';
 import GradientHeader from '../../components/GradientHeader';
+import { getListItemAnimation } from '../../utils/animations';
 
 type UserDetailRouteProp = RouteProp<{ UserDetail: { userId: string } }, 'UserDetail'>;
 
@@ -141,7 +142,7 @@ const UserDetailScreen = () => {
       >
         {/* Card Principal */}
         <AnimatedTouchableOpacity
-          entering={FadeInDown.delay(0).springify().damping(15)}
+          entering={getListItemAnimation(0, 50)}
           style={styles.mainCard}
           activeOpacity={1}
         >
@@ -172,7 +173,7 @@ const UserDetailScreen = () => {
 
         {/* Informações Pessoais */}
         <AnimatedTouchableOpacity
-          entering={FadeInDown.delay(100).springify().damping(15)}
+          entering={getListItemAnimation(1, 50)}
           style={styles.infoCard}
           activeOpacity={1}
         >
@@ -215,7 +216,7 @@ const UserDetailScreen = () => {
 
         {/* Informações do Condomínio */}
         <AnimatedTouchableOpacity
-          entering={FadeInDown.delay(200).springify().damping(15)}
+          entering={getListItemAnimation(2, 50)}
           style={styles.infoCard}
           activeOpacity={1}
         >
@@ -240,7 +241,7 @@ const UserDetailScreen = () => {
             <View style={styles.infoContent}>
               <Text style={styles.infoLabel}>Unidade</Text>
               <Text style={styles.infoValue}>
-                Bloco {user.unit.block} - Apto {user.unit.number}
+                {user.unit.block ? `Bloco ${user.unit.block} - ` : ''}Apto {user.unit.number}
               </Text>
             </View>
           </View>
@@ -249,7 +250,7 @@ const UserDetailScreen = () => {
         {/* Ações */}
         <View style={styles.actionsContainer}>
           <AnimatedTouchableOpacity
-            entering={FadeInDown.delay(300).springify().damping(15)}
+            entering={getListItemAnimation(3, 50)}
             style={styles.actionButton}
             onPress={handleEditUser}
             activeOpacity={0.7}
@@ -266,7 +267,7 @@ const UserDetailScreen = () => {
           </AnimatedTouchableOpacity>
 
           <AnimatedTouchableOpacity
-            entering={FadeInDown.delay(350).springify().damping(15)}
+            entering={getListItemAnimation(4, 50)}
             style={[styles.actionButton, styles.deleteButton]}
             onPress={handleDeleteUser}
             disabled={deleting}

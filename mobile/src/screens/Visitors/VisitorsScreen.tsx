@@ -11,17 +11,20 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../../contexts/AuthContext';
+import { useTheme } from '../../contexts/ThemeContext';
 import { visitorsApi, Visitor } from '../../api/visitors';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import Animated, { FadeInDown } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import GradientHeader from '../../components/GradientHeader';
+import { getListItemAnimation } from '../../utils/animations';
 
 const AnimatedView = Animated.createAnimatedComponent(View);
 
 const VisitorsScreen = () => {
   const navigation = useNavigation();
   const { user } = useAuth();
+  const { colors } = useTheme();
   const [visitors, setVisitors] = useState<Visitor[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -127,7 +130,7 @@ const VisitorsScreen = () => {
 
   const renderItem = ({ item, index }: { item: Visitor; index: number }) => (
     <AnimatedView
-      entering={FadeInDown.delay(index * 50).springify().damping(15)}
+      entering={getListItemAnimation(index, 50)}
       style={styles.card}
     >
       <View style={styles.cardHeader}>
@@ -138,7 +141,7 @@ const VisitorsScreen = () => {
           <Text style={styles.name}>{item.name}</Text>
           <View style={styles.unitRow}>
             <Ionicons name="home-outline" size={14} color="#64748B" />
-            <Text style={styles.unit}>{item.unit.block} - {item.unit.number}</Text>
+            <Text style={styles.unit}>{item.unit.block ? `${item.unit.block} - ` : ''}{item.unit.number}</Text>
           </View>
         </View>
         <View style={[styles.statusBadge, { backgroundColor: `${getStatusColor(item.status)}15` }]}>
@@ -197,7 +200,7 @@ const VisitorsScreen = () => {
   );
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <GradientHeader
         title="Visitantes"
         subtitle={`${visitors.length} visitante${visitors.length !== 1 ? 's' : ''} hoje`}
@@ -212,16 +215,16 @@ const VisitorsScreen = () => {
           <RefreshControl
             refreshing={loading}
             onRefresh={loadVisitors}
-            tintColor="#6366F1"
-            colors={['#6366F1']}
+            tintColor={colors.primary}
+            colors={[colors.primary]}
           />
         }
         contentContainerStyle={styles.list}
         ListEmptyComponent={
           <View style={styles.empty}>
-            <Ionicons name="people-outline" size={64} color="#CBD5E1" />
-            <Text style={styles.emptyText}>Nenhum visitante hoje</Text>
-            <Text style={styles.emptySubtext}>
+            <Ionicons name="people-outline" size={64} color={colors.textTertiary} />
+            <Text style={[styles.emptyText, { color: colors.textSecondary }]}>Nenhum visitante hoje</Text>
+            <Text style={[styles.emptySubtext, { color: colors.textTertiary }]}>
               Os visitantes agendados aparecerão aqui
             </Text>
           </View>

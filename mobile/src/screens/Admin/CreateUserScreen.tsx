@@ -108,11 +108,8 @@ const CreateUserScreen = () => {
     }
     const requiresUnitInfo = role === 'morador';
 
-    if (
-      requiresUnitInfo &&
-      (!block.trim() || !unitNumber.trim())
-    ) {
-      Alert.alert('Erro', 'Por favor, informe o bloco e número da unidade.');
+    if (requiresUnitInfo && !unitNumber.trim()) {
+      Alert.alert('Erro', 'Por favor, informe o número da unidade.');
       return;
     }
 
@@ -126,7 +123,7 @@ const CreateUserScreen = () => {
         phone: phone.trim(),
         role,
         unit: {
-          block: role === 'morador' ? block.trim() : block.trim() || 'Geral',
+          block: block.trim() || undefined,  // Opcional
           number: role === 'morador' ? unitNumber.trim() : unitNumber.trim() || 'SN',
         },
         condominium: targetCondominiumId,
@@ -285,6 +282,8 @@ const CreateUserScreen = () => {
                 placeholder="Senha (mínimo 6 caracteres)"
                 placeholderTextColor="#94A3B8"
                 secureTextEntry
+                textContentType="oneTimeCode"
+                autoComplete="off"
               />
             </View>
           </View>

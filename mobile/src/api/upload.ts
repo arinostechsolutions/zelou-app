@@ -1,5 +1,5 @@
 import api from './axios';
-import * as FileSystem from 'expo-file-system';
+import { File } from 'expo-file-system/next';
 
 export interface UploadResponse {
   message: string;
@@ -10,31 +10,63 @@ export interface UploadResponse {
   size: number;
 }
 
-export type UploadType = 'document' | 'rule' | 'delivery' | 'report' | 'announcement' | 'avatar';
+export type UploadType = 'document' | 'rule' | 'delivery' | 'report' | 'announcement' | 'avatar' | 'maintenance';
 
 /**
  * Faz upload de um arquivo para o Cloudinary via backend
  * @param fileUri URI local do arquivo
- * @param fileName Nome do arquivo
+ * @param fileName Nome do arquivo (opcional, será gerado automaticamente)
  * @param type Tipo do upload (document, rule, delivery, etc)
  * @param mimeType Tipo MIME do arquivo
+ * @returns URL do arquivo no Cloudinary
  */
 export const uploadFile = async (
+  fileUri: string,
+  fileName?: string,
+  type: UploadType = 'report',
+  mimeType: string = 'image/jpeg'
+): Promise<string> => {
+  try {
+    // Usar a nova API do expo-file-system (SDK 54+)
+    const file = new File(fileUri);
+    const base64 = await file.base64();
+
+    // Gerar nome de arquivo se não fornecido
+    const generatedFileName = fileName || `image_${Date.now()}.jpg`;
+
+    // Adicionar prefixo de data URI
+    const base64WithPrefix = `data:${mimeType};base64,${base64}`;
+
+    // Enviar para o backend
+    const response = await api.post<UploadResponse>('/upload/base64', {
+      base64: base64WithPrefix,
+      fileName: generatedFileName,
+      type,
+      mimeType,
+    });
+
+    return response.data.url;
+  } catch (error: any) {
+    console.error('Erro no upload:', error);
+    throw new Error(error.response?.data?.message || 'Erro ao fazer upload do arquivo');
+  }
+};
+
+/**
+ * Faz upload de um arquivo e retorna a resposta completa
+ * Útil quando precisa de informações adicionais como tamanho do arquivo
+ */
+export const uploadFileWithDetails = async (
   fileUri: string,
   fileName: string,
   type: UploadType,
   mimeType: string = 'application/octet-stream'
 ): Promise<UploadResponse> => {
   try {
-    // Ler o arquivo como base64
-    const base64 = await FileSystem.readAsStringAsync(fileUri, {
-      encoding: FileSystem.EncodingType.Base64,
-    });
-
-    // Adicionar prefixo de data URI
+    const file = new File(fileUri);
+    const base64 = await file.base64();
     const base64WithPrefix = `data:${mimeType};base64,${base64}`;
 
-    // Enviar para o backend
     const response = await api.post<UploadResponse>('/upload/base64', {
       base64: base64WithPrefix,
       fileName,

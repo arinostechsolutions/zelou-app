@@ -22,19 +22,23 @@ router.get('/', authenticate, async (req, res) => {
   }
 });
 
-// Buscar usuário por bloco/unidade
+// Buscar usuário por bloco/unidade (bloco é opcional)
 router.get('/lookup', authenticate, authorize(['porteiro', 'zelador', 'sindico', 'master']), async (req, res) => {
   try {
     const { block, number, condominiumId } = req.query;
 
-    if (!block || !number) {
-      return res.status(400).json({ message: 'Bloco e número são obrigatórios' });
+    if (!number) {
+      return res.status(400).json({ message: 'Número da unidade é obrigatório' });
     }
 
     const query = {
-      'unit.block': new RegExp(`^${block}$`, 'i'),
       'unit.number': new RegExp(`^${number}$`, 'i'),
     };
+
+    // Bloco é opcional - só adiciona se foi informado
+    if (block) {
+      query['unit.block'] = new RegExp(`^${block}$`, 'i');
+    }
 
     if (req.user.isMasterAdmin) {
       if (condominiumId) {
@@ -47,7 +51,7 @@ router.get('/lookup', authenticate, authorize(['porteiro', 'zelador', 'sindico',
     const user = await User.findOne(query).select('name email phone unit role condominium');
 
     if (!user) {
-      return res.status(404).json({ message: 'Morador não encontrado para o bloco/unidade informados' });
+      return res.status(404).json({ message: 'Morador não encontrado para a unidade informada' });
     }
 
     res.json(user);
@@ -55,6 +59,105 @@ router.get('/lookup', authenticate, authorize(['porteiro', 'zelador', 'sindico',
     res.status(500).json({ message: 'Erro ao buscar morador', error: error.message });
   }
 });
+
+// Listar usuários por condomínio (master admin)
+router.get('/condominium/:condominiumId', authenticate, isMaster, async (req, res) => {
+  try {
+    const users = await User.find({ condominium: req.params.condominiumId })
+      .select('-password')
+      .populate('condominium', 'name')
+      .sort({ role: 1, name: 1 });
+
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: 'Erro ao buscar usuários', error: error.message });
+  }
+});
+
+// ============================================
+// ROTAS /me/* - DEVEM VIR ANTES DE /:id
+// ============================================
+
+// Atualizar dados pessoais do usuário logado
+router.put('/me', authenticate, async (req, res) => {
+  try {
+    const { name, email, phone, currentPassword, newPassword } = req.body;
+    const user = req.user;
+
+    // Verificar se email já existe (se estiver mudando)
+    if (email && email !== user.email) {
+      const existingEmail = await User.findOne({ email, _id: { $ne: user._id } });
+      if (existingEmail) {
+        return res.status(400).json({ message: 'Este email já está em uso por outro usuário' });
+      }
+    }
+
+    // Atualizar campos básicos
+    if (name) user.name = name;
+    if (email) user.email = email;
+    if (phone !== undefined) user.phone = phone;
+
+    // Se quiser mudar a senha, precisa informar a senha atual
+    if (newPassword) {
+      if (!currentPassword) {
+        return res.status(400).json({ message: 'Informe a senha atual para alterar a senha' });
+      }
+
+      const isMatch = await user.comparePassword(currentPassword);
+      if (!isMatch) {
+        return res.status(400).json({ message: 'Senha atual incorreta' });
+      }
+
+      user.password = newPassword;
+    }
+
+    await user.save();
+
+    const updatedUser = await User.findById(user._id)
+      .select('-password')
+      .populate('condominium', 'name');
+
+    res.json(updatedUser);
+  } catch (error) {
+    console.error('Erro ao atualizar perfil:', error);
+    res.status(400).json({ message: 'Erro ao atualizar perfil', error: error.message });
+  }
+});
+
+// Atualizar push token do usuário logado
+router.put('/me/push-token', authenticate, async (req, res) => {
+  try {
+    const { pushToken } = req.body;
+
+    // Se pushToken é vazio/null, apenas limpa o token do usuário atual
+    if (!pushToken || pushToken === '') {
+      req.user.pushToken = null;
+      await req.user.save();
+      return res.json({ pushToken: null, message: 'Push token removido' });
+    }
+
+    // Remove esse token de outros usuários (evita duplicatas)
+    await User.updateMany(
+      { 
+        _id: { $ne: req.user._id }, 
+        pushToken: pushToken 
+      },
+      { $set: { pushToken: null } }
+    );
+
+    // Atualiza o token do usuário atual
+    req.user.pushToken = pushToken;
+    await req.user.save();
+
+    res.json({ pushToken });
+  } catch (error) {
+    res.status(500).json({ message: 'Erro ao atualizar push token', error: error.message });
+  }
+});
+
+// ============================================
+// ROTAS /:id - DEVEM VIR DEPOIS DE /me/*
+// ============================================
 
 // Buscar usuário por ID
 router.get('/:id', authenticate, canManageUser, async (req, res) => {
@@ -219,37 +322,4 @@ router.delete('/:id', authenticate, canManageUser, async (req, res) => {
   }
 });
 
-// Listar usuários por condomínio (master admin)
-router.get('/condominium/:condominiumId', authenticate, isMaster, async (req, res) => {
-  try {
-    const users = await User.find({ condominium: req.params.condominiumId })
-      .select('-password')
-      .populate('condominium', 'name')
-      .sort({ role: 1, name: 1 });
-
-    res.json(users);
-  } catch (error) {
-    res.status(500).json({ message: 'Erro ao buscar usuários', error: error.message });
-  }
-});
-
-// Atualizar push token do usuário logado
-router.put('/me/push-token', authenticate, async (req, res) => {
-  try {
-    const { pushToken } = req.body;
-
-    if (!pushToken) {
-      return res.status(400).json({ message: 'pushToken é obrigatório' });
-    }
-
-    req.user.pushToken = pushToken;
-    await req.user.save();
-
-    res.json({ pushToken });
-  } catch (error) {
-    res.status(500).json({ message: 'Erro ao atualizar push token', error: error.message });
-  }
-});
-
 module.exports = router;
-

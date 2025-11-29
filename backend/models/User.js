@@ -44,7 +44,7 @@ const userSchema = new mongoose.Schema({
   unit: {
     block: {
       type: String,
-      required: true
+      default: null  // Opcional - alguns condomínios não têm blocos/torres
     },
     number: {
       type: String,
@@ -62,6 +62,15 @@ const userSchema = new mongoose.Schema({
   isMasterAdmin: {
     type: Boolean,
     default: false
+  },
+  // Campos para reset de senha
+  resetPasswordCode: {
+    type: String,
+    default: null
+  },
+  resetPasswordExpires: {
+    type: Date,
+    default: null
   },
   createdAt: {
     type: Date,

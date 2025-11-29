@@ -29,6 +29,7 @@ app.use('/api/visitors', require('./routes/visitors'));
 app.use('/api/documents', require('./routes/documents'));
 app.use('/api/upload', require('./routes/upload'));
 app.use('/api/notifications', require('./routes/notifications'));
+app.use('/api/maintenances', require('./routes/maintenances'));
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -36,8 +37,11 @@ app.get('/api/health', (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
+const HOST = '0.0.0.0'; // Escuta em todas as interfaces de rede
+
+app.listen(PORT, HOST, () => {
+  console.log(`Servidor rodando em http://${HOST}:${PORT}`);
+  console.log(`Acesse de outros dispositivos usando: http://192.168.1.64:${PORT}`);
 });
 
 

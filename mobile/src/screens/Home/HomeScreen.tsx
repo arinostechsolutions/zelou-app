@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { useAuth } from '../../contexts/AuthContext';
+import { useTheme } from '../../contexts/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -14,6 +15,7 @@ import Animated, {
   FadeInDown,
 } from 'react-native-reanimated';
 import { notificationsApi } from '../../api/notifications';
+import { ThemeColors } from '../../themes/colors';
 
 const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
 
@@ -23,9 +25,10 @@ interface ActionCardProps {
   color: string;
   delay: number;
   onPress: () => void;
+  colors: ThemeColors;
 }
 
-const ActionCard: React.FC<ActionCardProps> = ({ icon, label, color, delay, onPress }) => {
+const ActionCard: React.FC<ActionCardProps> = ({ icon, label, color, delay, onPress, colors }) => {
   const scale = useSharedValue(1);
   const opacity = useSharedValue(1);
 
@@ -37,19 +40,35 @@ const ActionCard: React.FC<ActionCardProps> = ({ icon, label, color, delay, onPr
   });
 
   const handlePressIn = () => {
-    scale.value = withSpring(0.95, { damping: 15, stiffness: 300 });
-    opacity.value = withTiming(0.8, { duration: 100 });
+    // Usar animação mais suave no iOS (sem bounce)
+    if (Platform.OS === 'ios') {
+      scale.value = withTiming(0.96, { duration: 100 });
+      opacity.value = withTiming(0.7, { duration: 100 });
+    } else {
+      scale.value = withSpring(0.95, { damping: 15, stiffness: 300 });
+      opacity.value = withTiming(0.8, { duration: 100 });
+    }
   };
 
   const handlePressOut = () => {
-    scale.value = withSpring(1, { damping: 15, stiffness: 300 });
-    opacity.value = withTiming(1, { duration: 100 });
+    if (Platform.OS === 'ios') {
+      scale.value = withTiming(1, { duration: 100 });
+      opacity.value = withTiming(1, { duration: 100 });
+    } else {
+      scale.value = withSpring(1, { damping: 15, stiffness: 300 });
+      opacity.value = withTiming(1, { duration: 100 });
+    }
   };
+
+  // Animação de entrada: suave no iOS, spring no Android
+  const enteringAnimation = Platform.OS === 'ios' 
+    ? FadeInDown.delay(delay).duration(300)
+    : FadeInDown.delay(delay).springify().damping(15);
 
   return (
     <AnimatedTouchableOpacity
-      entering={FadeInDown.delay(delay).springify().damping(15)}
-      style={[styles.actionCard, animatedStyle]}
+      entering={enteringAnimation}
+      style={[styles.actionCard, animatedStyle, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}
       onPress={onPress}
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
@@ -58,7 +77,7 @@ const ActionCard: React.FC<ActionCardProps> = ({ icon, label, color, delay, onPr
       <View style={[styles.iconContainer, { backgroundColor: `${color}20` }]}>
         <Ionicons name={icon} size={32} color={color} />
       </View>
-      <Text style={styles.actionText}>{label}</Text>
+      <Text style={[styles.actionText, { color: colors.text }]}>{label}</Text>
     </AnimatedTouchableOpacity>
   );
 };
@@ -67,6 +86,7 @@ const HomeScreen = () => {
   const navigation = useNavigation();
   const rootNavigation = navigation.getParent();
   const { user } = useAuth();
+  const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const headerOpacity = useSharedValue(0);
   const headerTranslateY = useSharedValue(-20);
@@ -239,6 +259,13 @@ const HomeScreen = () => {
       onPress: () => navigation.navigate('Documents' as never, { type: 'rule' } as never),
       show: true,
     },
+    {
+      icon: 'construct' as keyof typeof Ionicons.glyphMap,
+      label: 'Manutenções',
+      color: '#F97316',
+      onPress: () => navigateToScreen('Maintenances'),
+      show: true,
+    },
   ];
 
   // Selecionar ações baseado no role do usuário
@@ -246,7 +273,7 @@ const HomeScreen = () => {
   const actions = (isMasterAdmin ? masterAdminActions : regularActions).filter((action) => action.show);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView 
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
@@ -254,7 +281,7 @@ const HomeScreen = () => {
       >
         <Animated.View style={[styles.header, headerAnimatedStyle]}>
           <LinearGradient
-            colors={['#6366F1', '#8B5CF6', '#A855F7']}
+            colors={[colors.headerGradientStart, colors.headerGradientMiddle, colors.headerGradientEnd]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={[styles.gradient, { paddingTop: insets.top + 16 }]}
@@ -275,7 +302,7 @@ const HomeScreen = () => {
                       <View style={styles.infoItem}>
                         <Ionicons name="home-outline" size={16} color="#E0E7FF" />
                         <Text style={styles.infoText}>
-                          {user.unit.block} - {user.unit.number}
+                          {user.unit.block ? `${user.unit.block} - ` : ''}{user.unit.number}
                         </Text>
                       </View>
                     </>
@@ -311,6 +338,7 @@ const HomeScreen = () => {
               color={action.color}
               delay={index * 100}
               onPress={action.onPress}
+              colors={colors}
             />
           ))}
         </View>
@@ -322,7 +350,6 @@ const HomeScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F1F5F9',
   },
   scrollView: {
     flex: 1,

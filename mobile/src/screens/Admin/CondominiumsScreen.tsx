@@ -12,9 +12,10 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import Animated, { FadeInDown } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import { condominiumsApi, Condominium } from '../../api/condominiums';
 import GradientHeader from '../../components/GradientHeader';
+import { getListItemAnimation } from '../../utils/animations';
 
 const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
 
@@ -47,7 +48,7 @@ const CondominiumsScreen = () => {
 
   const renderItem = ({ item, index }: { item: Condominium; index: number }) => (
     <AnimatedTouchableOpacity
-      entering={FadeInDown.delay(index * 50).springify().damping(15)}
+      entering={getListItemAnimation(index, 50)}
       style={styles.card}
       onPress={() => navigation.navigate('CondominiumDetail' as never, { id: item._id } as never)}
       activeOpacity={0.7}

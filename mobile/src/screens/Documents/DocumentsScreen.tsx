@@ -12,12 +12,14 @@ import {
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useAuth } from '../../contexts/AuthContext';
+import { useTheme } from '../../contexts/ThemeContext';
 import { documentsApi, Document } from '../../api/documents';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import Animated, { FadeInDown } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import GradientHeader from '../../components/GradientHeader';
 import { formatDateTime } from '../../utils/dateFormat';
+import { getListItemAnimation } from '../../utils/animations';
 
 const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
 
@@ -25,6 +27,7 @@ const DocumentsScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const { user } = useAuth();
+  const { colors } = useTheme();
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -116,7 +119,7 @@ const DocumentsScreen = () => {
 
   const renderItem = ({ item, index }: { item: Document; index: number }) => (
     <AnimatedTouchableOpacity
-      entering={FadeInDown.delay(index * 50).springify().damping(15)}
+      entering={getListItemAnimation(index, 50)}
       style={styles.card}
       onPress={() => handleOpenDocument(item)}
       activeOpacity={0.7}
@@ -159,7 +162,7 @@ const DocumentsScreen = () => {
   );
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <GradientHeader
         title={isRules ? 'Regras' : 'Documentos'}
         subtitle={`${documents.length} ${isRules ? 'regra' : 'documento'}${documents.length !== 1 ? 's' : ''}`}
@@ -174,8 +177,8 @@ const DocumentsScreen = () => {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor="#6366F1"
-            colors={['#6366F1']}
+            tintColor={colors.primary}
+            colors={[colors.primary]}
           />
         }
         contentContainerStyle={styles.list}
@@ -184,13 +187,13 @@ const DocumentsScreen = () => {
             <Ionicons 
               name={isRules ? 'list-outline' : 'folder-open-outline'} 
               size={64} 
-              color="#CBD5E1" 
+              color={colors.textTertiary} 
             />
-            <Text style={styles.emptyText}>
+            <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
               {isRules ? 'Nenhuma regra cadastrada' : 'Nenhum documento cadastrado'}
             </Text>
             {isSindico && (
-              <Text style={styles.emptySubtext}>
+              <Text style={[styles.emptySubtext, { color: colors.textTertiary }]}>
                 Toque no botão + para adicionar
               </Text>
             )}

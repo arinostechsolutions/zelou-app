@@ -4,6 +4,7 @@ const { body, validationResult } = require('express-validator');
 const User = require('../models/User');
 const InviteCode = require('../models/InviteCode');
 const { auth } = require('../middleware/auth');
+const { generateResetCode, sendPasswordResetEmail } = require('../utils/email');
 
 const router = express.Router();
 
@@ -20,8 +21,8 @@ router.post('/register', [
   body('cpf').trim().notEmpty().withMessage('CPF é obrigatório'),
   body('phone').trim().notEmpty().withMessage('Telefone é obrigatório'),
   body('inviteCode').trim().notEmpty().withMessage('Código de convite é obrigatório'),
-  body('unit.block').trim().notEmpty().withMessage('Bloco é obrigatório'),
   body('unit.number').trim().notEmpty().withMessage('Número da unidade é obrigatório')
+  // Bloco é opcional - alguns condomínios não têm blocos/torres
 ], async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -167,6 +168,7 @@ router.post('/login', [
 });
 
 // POST /api/auth/forgot-password
+// Envia código de 6 dígitos para o email
 router.post('/forgot-password', [
   body('email').isEmail().withMessage('Email inválido')
 ], async (req, res) => {
@@ -177,25 +179,75 @@ router.post('/forgot-password', [
     }
 
     const { email } = req.body;
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: email.toLowerCase() });
 
     if (!user) {
-      // Don't reveal if user exists for security
-      return res.json({ message: 'Se o email existir, você receberá instruções para redefinir sua senha' });
+      // Por segurança, não revelamos se o email existe ou não
+      return res.json({ 
+        message: 'Se o email existir, você receberá um código de verificação',
+        success: true 
+      });
     }
 
-    // TODO: Implement email sending with reset token
-    // For now, just return success
-    res.json({ message: 'Se o email existir, você receberá instruções para redefinir sua senha' });
+    // Gera código de 6 dígitos
+    const code = generateResetCode();
+    
+    // Salva o código e define expiração (15 minutos)
+    user.resetPasswordCode = code;
+    user.resetPasswordExpires = new Date(Date.now() + 15 * 60 * 1000);
+    await user.save();
+
+    // Envia email com o código
+    await sendPasswordResetEmail(email, code, user.name.split(' ')[0]);
+
+    res.json({ 
+      message: 'Código de verificação enviado para seu email',
+      success: true 
+    });
   } catch (error) {
-    console.error(error);
+    console.error('Erro no forgot-password:', error);
     res.status(500).json({ message: 'Erro ao processar solicitação', error: error.message });
   }
 });
 
+// POST /api/auth/verify-reset-code
+// Verifica se o código é válido
+router.post('/verify-reset-code', [
+  body('email').isEmail().withMessage('Email inválido'),
+  body('code').isLength({ min: 6, max: 6 }).withMessage('Código deve ter 6 dígitos')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { email, code } = req.body;
+    const user = await User.findOne({ 
+      email: email.toLowerCase(),
+      resetPasswordCode: code,
+      resetPasswordExpires: { $gt: new Date() }
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: 'Código inválido ou expirado' });
+    }
+
+    res.json({ 
+      message: 'Código verificado com sucesso',
+      valid: true 
+    });
+  } catch (error) {
+    console.error('Erro no verify-reset-code:', error);
+    res.status(500).json({ message: 'Erro ao verificar código', error: error.message });
+  }
+});
+
 // POST /api/auth/reset-password
+// Redefine a senha com o código verificado
 router.post('/reset-password', [
-  body('token').notEmpty().withMessage('Token é obrigatório'),
+  body('email').isEmail().withMessage('Email inválido'),
+  body('code').isLength({ min: 6, max: 6 }).withMessage('Código deve ter 6 dígitos'),
   body('password').isLength({ min: 6 }).withMessage('Senha deve ter no mínimo 6 caracteres')
 ], async (req, res) => {
   try {
@@ -204,10 +256,29 @@ router.post('/reset-password', [
       return res.status(400).json({ errors: errors.array() });
     }
 
-    // TODO: Implement password reset logic with token validation
-    res.json({ message: 'Senha redefinida com sucesso' });
+    const { email, code, password } = req.body;
+    const user = await User.findOne({ 
+      email: email.toLowerCase(),
+      resetPasswordCode: code,
+      resetPasswordExpires: { $gt: new Date() }
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: 'Código inválido ou expirado' });
+    }
+
+    // Atualiza a senha (o hash é feito automaticamente no pre-save)
+    user.password = password;
+    user.resetPasswordCode = null;
+    user.resetPasswordExpires = null;
+    await user.save();
+
+    res.json({ 
+      message: 'Senha redefinida com sucesso!',
+      success: true 
+    });
   } catch (error) {
-    console.error(error);
+    console.error('Erro no reset-password:', error);
     res.status(500).json({ message: 'Erro ao redefinir senha', error: error.message });
   }
 });

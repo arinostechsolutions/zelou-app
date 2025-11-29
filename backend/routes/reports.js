@@ -1,9 +1,38 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
 const Report = require('../models/Report');
+const User = require('../models/User');
 const { auth, isMorador, isZelador } = require('../middleware/auth');
+const { createNotification } = require('../utils/pushNotifications');
 
 const router = express.Router();
+
+// Helper para notificar gestores (porteiro, zelador, síndico) sobre nova irregularidade
+const notifyManagersAboutReport = async (condominiumId, report, creatorName) => {
+  try {
+    const managers = await User.find({
+      condominium: condominiumId,
+      role: { $in: ['porteiro', 'zelador', 'sindico'] }
+    }).select('_id');
+
+    const title = '🚨 Nova Irregularidade';
+    const body = `${creatorName} registrou: ${report.category} - ${report.location}`;
+
+    for (const manager of managers) {
+      await createNotification(
+        manager._id,
+        title,
+        body,
+        'report',
+        { reportId: report._id.toString() }
+      );
+    }
+
+    console.log(`📋 Notificação de irregularidade enviada para ${managers.length} gestor(es)`);
+  } catch (error) {
+    console.error('Erro ao notificar gestores sobre irregularidade:', error);
+  }
+};
 
 // GET /api/reports
 router.get('/', auth, async (req, res) => {
@@ -66,6 +95,13 @@ router.post('/', [auth, isMorador], [
     await report.save();
     await report.populate('userId', 'name unit');
 
+    // Notificar gestores (porteiro, zelador, síndico) sobre a nova irregularidade
+    await notifyManagersAboutReport(
+      req.user.condominium._id,
+      report,
+      req.user.name
+    );
+
     res.status(201).json(report);
   } catch (error) {
     console.error(error);
@@ -126,6 +162,21 @@ router.put('/:id/status', [auth, isZelador], [
     await report.save();
     await report.populate('userId', 'name unit');
     await report.populate('history.changedBy', 'name role');
+
+    // Notificar o morador que criou a irregularidade sobre a atualização
+    const statusLabels = {
+      'aberta': 'Aberta',
+      'andamento': 'Em Andamento',
+      'concluida': 'Concluída'
+    };
+    
+    await createNotification(
+      report.userId._id,
+      `📋 Irregularidade ${statusLabels[status]}`,
+      `Sua irregularidade "${report.category}" foi atualizada para: ${statusLabels[status]}${comment ? ` - ${comment}` : ''}`,
+      'report_update',
+      { reportId: report._id.toString() }
+    );
 
     res.json(report);
   } catch (error) {

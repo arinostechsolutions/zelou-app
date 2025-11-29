@@ -16,9 +16,10 @@ import {
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import Animated, { FadeInDown } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import { condominiumsApi } from '../../api/condominiums';
 import GradientHeader from '../../components/GradientHeader';
+import { getListItemAnimation } from '../../utils/animations';
 import { formatDate } from '../../utils/dateFormat';
 
 type InviteCodesRouteProp = RouteProp<{ InviteCodes: { condominiumId: string } }, 'InviteCodes'>;
@@ -61,8 +62,8 @@ const InviteCodesScreen = () => {
 
   const loadInviteCodes = useCallback(async () => {
     try {
-      const response = await condominiumsApi.getInviteCodes(condominiumId);
-      setInviteCodes(response.data);
+      const data = await condominiumsApi.getInviteCodes(condominiumId);
+      setInviteCodes(data || []);
     } catch (error: any) {
       console.error('Erro ao carregar códigos:', error);
       Alert.alert('Erro', 'Não foi possível carregar os códigos de convite.');
@@ -162,7 +163,7 @@ const InviteCodesScreen = () => {
 
     return (
       <AnimatedTouchableOpacity
-        entering={FadeInDown.delay(index * 50).springify().damping(15)}
+        entering={getListItemAnimation(index, 50)}
         style={[styles.card, !item.isActive && styles.cardInactive]}
         activeOpacity={0.7}
       >

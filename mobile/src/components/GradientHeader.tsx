@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface GradientHeaderProps {
   title: string;
@@ -20,10 +21,11 @@ const GradientHeader: React.FC<GradientHeaderProps> = ({
   rightComponent,
 }) => {
   const insets = useSafeAreaInsets();
+  const { colors, isDark } = useTheme();
 
   return (
     <LinearGradient
-      colors={['#6366F1', '#8B5CF6', '#A855F7']}
+      colors={[colors.headerGradientStart, colors.headerGradientMiddle, colors.headerGradientEnd]}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
       style={[styles.header, { paddingTop: insets.top + 16 }]}
@@ -81,7 +83,7 @@ const styles = StyleSheet.create({
   },
   headerSubtitle: {
     fontSize: 14,
-    color: '#E0E7FF',
+    color: 'rgba(255, 255, 255, 0.8)',
     fontWeight: '500',
   },
   rightComponent: {

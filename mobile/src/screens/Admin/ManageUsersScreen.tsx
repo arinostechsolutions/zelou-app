@@ -13,10 +13,11 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import Animated, { FadeInDown } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import { usersApi, User } from '../../api/users';
 import { useAuth } from '../../contexts/AuthContext';
 import GradientHeader from '../../components/GradientHeader';
+import { getListItemAnimation } from '../../utils/animations';
 
 const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
 
@@ -119,7 +120,7 @@ const ManageUsersScreen = () => {
 
   const renderUser = ({ item, index }: { item: User; index: number }) => (
     <AnimatedTouchableOpacity
-      entering={FadeInDown.delay(index * 30).springify().damping(15)}
+      entering={getListItemAnimation(index)}
       style={styles.userCard}
       onPress={() => navigation.navigate('UserDetail' as never, { userId: item._id } as never)}
       activeOpacity={0.7}

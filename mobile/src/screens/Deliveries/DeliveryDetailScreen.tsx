@@ -145,7 +145,7 @@ const DeliveryDetailScreen = () => {
               <View style={styles.unitRow}>
                 <Ionicons name="home-outline" size={14} color="#64748B" />
                 <Text style={styles.unitText}>
-                  {delivery.residentId.unit.block} - {delivery.residentId.unit.number}
+                  {delivery.residentId.unit.block ? `${delivery.residentId.unit.block} - ` : ''}{delivery.residentId.unit.number}
                 </Text>
               </View>
             </View>

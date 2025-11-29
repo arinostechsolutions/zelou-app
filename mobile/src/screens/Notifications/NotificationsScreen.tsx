@@ -12,9 +12,11 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { notificationsApi, Notification } from '../../api/notifications';
+import { useTheme } from '../../contexts/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import Animated, { FadeInDown, FadeInRight } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
+import { getListItemAnimation } from '../../utils/animations';
 import GradientHeader from '../../components/GradientHeader';
 import { formatDateRelative } from '../../utils/dateFormat';
 
@@ -22,6 +24,7 @@ const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpaci
 
 const NotificationsScreen = () => {
   const navigation = useNavigation();
+  const { colors } = useTheme();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -129,6 +132,13 @@ const NotificationsScreen = () => {
           navigation.navigate('Documents' as never, { type: 'document' } as never);
         }
         break;
+      case 'maintenance':
+        if (data?.maintenanceId) {
+          navigation.navigate('MaintenanceDetail' as never, { maintenanceId: data.maintenanceId } as never);
+        } else {
+          navigation.navigate('Maintenances' as never);
+        }
+        break;
       default:
         // Notificações gerais não navegam
         break;
@@ -195,6 +205,8 @@ const NotificationsScreen = () => {
         return 'people';
       case 'document':
         return 'document-text';
+      case 'maintenance':
+        return 'construct';
       default:
         return 'notifications';
     }
@@ -225,6 +237,8 @@ const NotificationsScreen = () => {
         return '#06B6D4';
       case 'document':
         return '#3B82F6';
+      case 'maintenance':
+        return '#F97316';
       default:
         return '#64748B';
     }
@@ -235,7 +249,7 @@ const NotificationsScreen = () => {
     
     return (
       <AnimatedTouchableOpacity
-        entering={FadeInDown.delay(index * 30).springify().damping(15)}
+        entering={getListItemAnimation(index)}
         style={[
           styles.notificationCard,
           !item.read && styles.unreadCard
@@ -273,21 +287,21 @@ const NotificationsScreen = () => {
 
   if (loading) {
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
         <GradientHeader
           title="Notificações"
           subtitle="Suas atualizações"
           onBackPress={() => navigation.goBack()}
         />
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#6366F1" />
+          <ActivityIndicator size="large" color={colors.primary} />
         </View>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <GradientHeader
         title="Notificações"
         subtitle={unreadCount > 0 ? `${unreadCount} não lida${unreadCount > 1 ? 's' : ''}` : 'Todas lidas'}
@@ -306,14 +320,14 @@ const NotificationsScreen = () => {
       />
 
       {notifications.length > 0 && (
-        <View style={styles.actionsBar}>
+        <View style={[styles.actionsBar, { backgroundColor: colors.card, borderBottomColor: colors.border }]}>
           <TouchableOpacity
             style={styles.actionButton}
             onPress={handleMarkAllAsRead}
             activeOpacity={0.7}
           >
-            <Ionicons name="checkmark-done-outline" size={18} color="#6366F1" />
-            <Text style={styles.actionText}>Marcar todas como lidas</Text>
+            <Ionicons name="checkmark-done-outline" size={18} color={colors.primary} />
+            <Text style={[styles.actionText, { color: colors.primary }]}>Marcar todas como lidas</Text>
           </TouchableOpacity>
           
           <TouchableOpacity
@@ -321,8 +335,8 @@ const NotificationsScreen = () => {
             onPress={handleDeleteAll}
             activeOpacity={0.7}
           >
-            <Ionicons name="trash-outline" size={18} color="#EF4444" />
-            <Text style={[styles.actionText, { color: '#EF4444' }]}>Limpar</Text>
+            <Ionicons name="trash-outline" size={18} color={colors.error} />
+            <Text style={[styles.actionText, { color: colors.error }]}>Limpar</Text>
           </TouchableOpacity>
         </View>
       )}

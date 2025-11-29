@@ -11,6 +11,8 @@ import {
   TextInput,
   ActivityIndicator,
   Platform,
+  Modal,
+  Dimensions,
 } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { useAuth } from '../../contexts/AuthContext';
@@ -20,6 +22,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import GradientHeader from '../../components/GradientHeader';
 import { formatDateTime } from '../../utils/dateFormat';
+
+const { width: screenWidth } = Dimensions.get('window');
 
 const ReportDetailScreen = () => {
   const route = useRoute();
@@ -31,6 +35,8 @@ const ReportDetailScreen = () => {
   const [comment, setComment] = useState('');
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   useEffect(() => {
     loadReport();
@@ -151,15 +157,35 @@ const ReportDetailScreen = () => {
         {/* Fotos */}
         {report.photos && report.photos.length > 0 && (
           <View style={styles.photosSection}>
+            <View style={styles.photosSectionHeader}>
+              <Text style={styles.photosSectionTitle}>
+                <Ionicons name="images-outline" size={18} color="#1E293B" /> Fotos da Ocorrência
+              </Text>
+              <Text style={styles.photosCount}>{report.photos.length} foto(s)</Text>
+            </View>
             <FlatList
               horizontal
               data={report.photos}
-              renderItem={({ item }) => (
-                <Image source={{ uri: item }} style={styles.photo} />
+              renderItem={({ item, index }) => (
+                <TouchableOpacity 
+                  onPress={() => {
+                    setSelectedImage(item);
+                    setCurrentImageIndex(index);
+                  }}
+                  activeOpacity={0.9}
+                >
+                  <Image source={{ uri: item }} style={styles.photo} resizeMode="cover" />
+                  <View style={styles.photoOverlay}>
+                    <Ionicons name="expand-outline" size={20} color="#FFFFFF" />
+                  </View>
+                </TouchableOpacity>
               )}
               keyExtractor={(item, index) => index.toString()}
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.photosList}
+              pagingEnabled
+              snapToInterval={screenWidth - 32 + 12}
+              decelerationRate="fast"
             />
           </View>
         )}
@@ -288,6 +314,72 @@ const ReportDetailScreen = () => {
           </TouchableOpacity>
         </View>
       </ScrollView>
+
+      {/* Modal de Imagem em Tela Cheia */}
+      <Modal
+        visible={selectedImage !== null}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setSelectedImage(null)}
+      >
+        <View style={styles.imageModalContainer}>
+          <TouchableOpacity 
+            style={styles.imageModalClose}
+            onPress={() => setSelectedImage(null)}
+          >
+            <Ionicons name="close" size={28} color="#FFFFFF" />
+          </TouchableOpacity>
+          
+          {report?.photos && report.photos.length > 1 && (
+            <View style={styles.imageModalCounter}>
+              <Text style={styles.imageModalCounterText}>
+                {currentImageIndex + 1} / {report.photos.length}
+              </Text>
+            </View>
+          )}
+
+          <FlatList
+            horizontal
+            data={report?.photos || []}
+            renderItem={({ item }) => (
+              <View style={styles.fullImageContainer}>
+                <Image 
+                  source={{ uri: item }} 
+                  style={styles.fullImage} 
+                  resizeMode="contain"
+                />
+              </View>
+            )}
+            keyExtractor={(item, index) => index.toString()}
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            initialScrollIndex={currentImageIndex}
+            getItemLayout={(_, index) => ({
+              length: screenWidth,
+              offset: screenWidth * index,
+              index,
+            })}
+            onMomentumScrollEnd={(e) => {
+              const newIndex = Math.round(e.nativeEvent.contentOffset.x / screenWidth);
+              setCurrentImageIndex(newIndex);
+            }}
+          />
+
+          {report?.photos && report.photos.length > 1 && (
+            <View style={styles.imageModalDots}>
+              {report.photos.map((_, index) => (
+                <View 
+                  key={index} 
+                  style={[
+                    styles.imageModalDot,
+                    index === currentImageIndex && styles.imageModalDotActive
+                  ]} 
+                />
+              ))}
+            </View>
+          )}
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -322,17 +414,113 @@ const styles = StyleSheet.create({
   },
   photosSection: {
     marginBottom: 16,
+    backgroundColor: '#FFFFFF',
+    marginHorizontal: 16,
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 2,
+    borderColor: '#E2E8F0',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.08,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
+  },
+  photosSectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  photosSectionTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#1E293B',
+  },
+  photosCount: {
+    fontSize: 13,
+    color: '#64748B',
+    fontWeight: '500',
   },
   photosList: {
-    paddingHorizontal: 16,
     gap: 12,
   },
   photo: {
-    width: 280,
-    height: 180,
+    width: screenWidth - 64,
+    height: 250,
     borderRadius: 12,
     backgroundColor: '#E2E8F0',
     marginRight: 12,
+  },
+  photoOverlay: {
+    position: 'absolute',
+    bottom: 12,
+    right: 12,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    borderRadius: 20,
+    padding: 8,
+  },
+  // Modal de imagem em tela cheia
+  imageModalContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.95)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  imageModalClose: {
+    position: 'absolute',
+    top: 50,
+    right: 20,
+    zIndex: 10,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    borderRadius: 20,
+    padding: 8,
+  },
+  imageModalCounter: {
+    position: 'absolute',
+    top: 50,
+    left: 20,
+    zIndex: 10,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  imageModalCounterText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  fullImageContainer: {
+    width: screenWidth,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  fullImage: {
+    width: screenWidth,
+    height: '80%',
+  },
+  imageModalDots: {
+    position: 'absolute',
+    bottom: 50,
+    flexDirection: 'row',
+    gap: 8,
+  },
+  imageModalDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: 'rgba(255,255,255,0.4)',
+  },
+  imageModalDotActive: {
+    backgroundColor: '#FFFFFF',
+    width: 24,
   },
   statusCard: {
     flexDirection: 'row',

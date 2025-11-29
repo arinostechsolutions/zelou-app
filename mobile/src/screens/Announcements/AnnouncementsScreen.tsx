@@ -2,18 +2,21 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, RefreshControl, Image, Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../../contexts/AuthContext';
+import { useTheme } from '../../contexts/ThemeContext';
 import { announcementsApi, Announcement } from '../../api/announcements';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Animated, { FadeInDown } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import { formatDate } from '../../utils/dateFormat';
+import { getListItemAnimation } from '../../utils/animations';
 
 const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
 
 const AnnouncementsScreen = () => {
   const navigation = useNavigation();
   const { user } = useAuth();
+  const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(false);
@@ -38,25 +41,55 @@ const AnnouncementsScreen = () => {
 
   const renderItem = ({ item, index }: { item: Announcement; index: number }) => (
     <AnimatedTouchableOpacity
-      entering={FadeInDown.delay(index * 50).springify().damping(15)}
-      style={[styles.card, item.priority && styles.priorityCard]}
+      entering={getListItemAnimation(index)}
+      style={[
+        styles.card, 
+        { backgroundColor: colors.card, borderColor: colors.cardBorder },
+        item.priority && { borderColor: colors.error }
+      ]}
       onPress={() => navigation.navigate('AnnouncementDetail' as never, { announcementId: item._id } as never)}
       activeOpacity={0.7}
     >
-      {item.priority && <View style={styles.priorityBadge}><Text style={styles.priorityText}>PRIORIDADE</Text></View>}
-      {item.photo && <Image source={{ uri: item.photo }} style={styles.photo} />}
+      {item.photo ? (
+        <Image source={{ uri: item.photo }} style={styles.photo} />
+      ) : (
+        <View style={[
+          styles.iconContainer, 
+          { backgroundColor: item.priority ? colors.errorBackground : colors.primaryBackground }
+        ]}>
+          <Ionicons 
+            name={item.priority ? "alert-circle" : "megaphone"} 
+            size={24} 
+            color={item.priority ? colors.error : colors.primary} 
+          />
+        </View>
+      )}
       <View style={styles.cardContent}>
-        <Text style={styles.title}>{item.title}</Text>
-        <Text style={styles.description} numberOfLines={2}>{item.description}</Text>
-        <Text style={styles.date}>{formatDate(item.createdAt)}</Text>
+        <View style={styles.cardHeader}>
+          <Text style={[styles.title, { color: colors.text }]} numberOfLines={1}>{item.title}</Text>
+          {item.priority && (
+            <View style={[styles.priorityBadge, { backgroundColor: colors.errorBackground }]}>
+              <Text style={[styles.priorityText, { color: colors.error }]}>URGENTE</Text>
+            </View>
+          )}
+        </View>
+        <Text style={[styles.description, { color: colors.textSecondary }]} numberOfLines={2}>{item.description}</Text>
+        <View style={styles.cardFooter}>
+          <View style={styles.authorRow}>
+            <Ionicons name="person-outline" size={12} color={colors.textTertiary} />
+            <Text style={[styles.author, { color: colors.textTertiary }]}>{item.createdBy?.name || 'Administração'}</Text>
+          </View>
+          <Text style={[styles.date, { color: colors.textTertiary }]}>{formatDate(item.createdAt)}</Text>
+        </View>
       </View>
+      <Ionicons name="chevron-forward" size={20} color={colors.textTertiary} style={styles.chevron} />
     </AnimatedTouchableOpacity>
   );
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <LinearGradient
-        colors={['#6366F1', '#8B5CF6', '#A855F7']}
+        colors={[colors.headerGradientStart, colors.headerGradientMiddle, colors.headerGradientEnd]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={[styles.header, { paddingTop: insets.top + 16 }]}
@@ -84,15 +117,15 @@ const AnnouncementsScreen = () => {
           <RefreshControl 
             refreshing={loading} 
             onRefresh={loadAnnouncements}
-            tintColor="#6366F1"
-            colors={['#6366F1']}
+            tintColor={colors.primary}
+            colors={[colors.primary]}
           />
         }
         contentContainerStyle={styles.list}
         ListEmptyComponent={
           <View style={styles.empty}>
-            <Ionicons name="megaphone-outline" size={64} color="#CBD5E1" />
-            <Text style={styles.emptyText}>Nenhum comunicado encontrado</Text>
+            <Ionicons name="megaphone-outline" size={64} color={colors.textTertiary} />
+            <Text style={[styles.emptyText, { color: colors.textSecondary }]}>Nenhum comunicado encontrado</Text>
           </View>
         }
       />
@@ -179,31 +212,103 @@ const styles = StyleSheet.create({
   list: { padding: 16, paddingBottom: 100 },
   card: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    marginBottom: 12,
-    overflow: 'hidden',
-    borderWidth: 2,
+    borderRadius: 12,
+    marginBottom: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    borderWidth: 1,
     borderColor: '#E2E8F0',
     ...Platform.select({
       ios: {
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.08,
-        shadowRadius: 8,
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.05,
+        shadowRadius: 4,
       },
       android: {
-        elevation: 4,
+        elevation: 2,
       },
     }),
   },
-  priorityCard: { borderLeftWidth: 4, borderLeftColor: '#FF3B30' },
-  priorityBadge: { backgroundColor: '#FF3B30', padding: 4, alignItems: 'center' },
-  priorityText: { color: '#fff', fontSize: 10, fontWeight: 'bold' },
-  photo: { width: '100%', height: 150, backgroundColor: '#f0f0f0' },
-  cardContent: { padding: 16 },
-  title: { fontSize: 18, fontWeight: '600', marginBottom: 8 },
-  description: { fontSize: 14, color: '#666', marginBottom: 8 },
-  date: { fontSize: 12, color: '#999' },
+  priorityCard: { 
+    borderLeftWidth: 3, 
+    borderLeftColor: '#EF4444',
+    backgroundColor: '#FEF2F2',
+  },
+  iconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 10,
+    backgroundColor: '#EEF2FF',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  iconContainerPriority: {
+    backgroundColor: '#FEE2E2',
+  },
+  photo: { 
+    width: 48, 
+    height: 48, 
+    borderRadius: 10,
+    backgroundColor: '#F1F5F9' 
+  },
+  cardContent: { 
+    flex: 1, 
+    marginLeft: 12,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
+  title: { 
+    fontSize: 15, 
+    fontWeight: '600', 
+    color: '#1E293B',
+    flex: 1,
+    marginRight: 8,
+  },
+  priorityBadge: { 
+    backgroundColor: '#EF4444', 
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  priorityText: { 
+    color: '#FFFFFF', 
+    fontSize: 9, 
+    fontWeight: '700',
+    letterSpacing: 0.5,
+  },
+  description: { 
+    fontSize: 13, 
+    color: '#64748B', 
+    lineHeight: 18,
+    marginBottom: 6,
+  },
+  cardFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  authorRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  author: {
+    fontSize: 12,
+    color: '#94A3B8',
+  },
+  date: { 
+    fontSize: 12, 
+    color: '#94A3B8',
+  },
+  chevron: {
+    marginLeft: 8,
+  },
   empty: {
     padding: 60,
     alignItems: 'center',

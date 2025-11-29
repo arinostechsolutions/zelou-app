@@ -15,9 +15,10 @@ import { reservationsApi, Area, AvailabilityResponse, DayAvailability } from '..
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Animated, { FadeInDown } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import GradientHeader from '../../components/GradientHeader';
 import { formatDateLong } from '../../utils/dateFormat';
+import { getListItemAnimation } from '../../utils/animations';
 
 const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
 
@@ -220,7 +221,7 @@ const CreateReservationScreen = () => {
               {areas.map((area, index) => (
                 <AnimatedTouchableOpacity
                   key={area._id}
-                  entering={FadeInDown.delay(index * 50).springify()}
+                  entering={getListItemAnimation(index, 50)}
                   style={[
                     styles.areaCard,
                     selectedArea?._id === area._id && styles.areaCardSelected

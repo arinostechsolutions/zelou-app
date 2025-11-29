@@ -4,6 +4,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
 import { Platform } from 'react-native';
 import Animated, { useAnimatedStyle, withSpring } from 'react-native-reanimated';
+import { useTheme } from '../contexts/ThemeContext';
 
 // Screens
 import HomeScreen from '../screens/Home/HomeScreen';
@@ -16,12 +17,14 @@ import CreateReportScreen from '../screens/Reports/CreateReportScreen';
 import ReservationsScreen from '../screens/Reservations/ReservationsScreen';
 import ReservationDetailScreen from '../screens/Reservations/ReservationDetailScreen';
 import CreateReservationScreen from '../screens/Reservations/CreateReservationScreen';
+import ReservationReportScreen from '../screens/Reservations/ReservationReportScreen';
 import AnnouncementsScreen from '../screens/Announcements/AnnouncementsScreen';
 import AnnouncementDetailScreen from '../screens/Announcements/AnnouncementDetailScreen';
 import CreateAnnouncementScreen from '../screens/Announcements/CreateAnnouncementScreen';
 import VisitorsScreen from '../screens/Visitors/VisitorsScreen';
 import CreateVisitorScreen from '../screens/Visitors/CreateVisitorScreen';
 import ProfileScreen from '../screens/Profile/ProfileScreen';
+import EditProfileScreen from '../screens/Profile/EditProfileScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -43,6 +46,7 @@ const HomeStack = () => (
     <Stack.Screen name="ReservationsList" component={ReservationsScreen} />
     <Stack.Screen name="ReservationDetail" component={ReservationDetailScreen} />
     <Stack.Screen name="CreateReservation" component={CreateReservationScreen} />
+    <Stack.Screen name="ReservationReport" component={ReservationReportScreen} />
     {/* Telas de Visitantes */}
     <Stack.Screen name="VisitorsList" component={VisitorsScreen} />
     <Stack.Screen name="CreateVisitor" component={CreateVisitorScreen} />
@@ -64,6 +68,12 @@ const HomeStack = () => (
     <Stack.Screen name="CreateDocument" component={CreateDocumentScreen} />
     {/* Tela de Notificações */}
     <Stack.Screen name="Notifications" component={NotificationsScreen} />
+    {/* Tela de Detalhe do Comunicado (acessível via notificação) */}
+    <Stack.Screen name="AnnouncementDetail" component={AnnouncementDetailScreen} />
+    {/* Telas de Manutenções */}
+    <Stack.Screen name="Maintenances" component={MaintenancesScreen} />
+    <Stack.Screen name="CreateMaintenance" component={CreateMaintenanceScreen} />
+    <Stack.Screen name="MaintenanceDetail" component={MaintenanceDetailScreen} />
   </Stack.Navigator>
 );
 
@@ -86,11 +96,17 @@ const DeliveriesStack = () => (
 const ProfileStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="ProfileMain" component={ProfileScreen} />
+    <Stack.Screen name="EditProfile" component={EditProfileScreen} />
   </Stack.Navigator>
 );
 
 // Animated Icon Component
-const AnimatedIcon = ({ focused, iconName }: { focused: boolean; iconName: keyof typeof Ionicons.glyphMap }) => {
+const AnimatedIcon = ({ focused, iconName, activeColor, inactiveColor }: { 
+  focused: boolean; 
+  iconName: keyof typeof Ionicons.glyphMap;
+  activeColor: string;
+  inactiveColor: string;
+}) => {
   const animatedStyle = useAnimatedStyle(() => {
     return {
       transform: [
@@ -109,14 +125,17 @@ const AnimatedIcon = ({ focused, iconName }: { focused: boolean; iconName: keyof
       <Ionicons 
         name={iconName} 
         size={28} 
-        color={focused ? '#6366F1' : '#94A3B8'} 
+        color={focused ? activeColor : inactiveColor} 
       />
     </Animated.View>
   );
 };
 
-const MainTabs = () => (
-  <Tab.Navigator
+const MainTabs = () => {
+  const { colors } = useTheme();
+
+  return (
+    <Tab.Navigator
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused }) => {
           let iconName: keyof typeof Ionicons.glyphMap = 'home';
@@ -131,15 +150,22 @@ const MainTabs = () => (
             iconName = focused ? 'person' : 'person-outline';
           }
 
-          return <AnimatedIcon focused={focused} iconName={iconName} />;
+          return (
+            <AnimatedIcon 
+              focused={focused} 
+              iconName={iconName} 
+              activeColor={colors.tabBarActive}
+              inactiveColor={colors.tabBarInactive}
+            />
+          );
         },
-        tabBarActiveTintColor: '#6366F1',
-        tabBarInactiveTintColor: '#94A3B8',
+        tabBarActiveTintColor: colors.tabBarActive,
+        tabBarInactiveTintColor: colors.tabBarInactive,
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: '#FFFFFF',
+          backgroundColor: colors.tabBarBackground,
           borderTopWidth: 1,
-          borderTopColor: '#E2E8F0',
+          borderTopColor: colors.tabBarBorder,
           height: Platform.OS === 'ios' ? 90 : 70,
           paddingBottom: Platform.OS === 'ios' ? 30 : 12,
           paddingTop: 10,
@@ -189,7 +215,8 @@ const MainTabs = () => (
         }}
       />
     </Tab.Navigator>
-);
+  );
+};
 
 // Admin Screens
 import CondominiumsScreen from '../screens/Admin/CondominiumsScreen';
@@ -206,6 +233,9 @@ import CreateAreaScreen from '../screens/Admin/CreateAreaScreen';
 import DocumentsScreen from '../screens/Documents/DocumentsScreen';
 import CreateDocumentScreen from '../screens/Documents/CreateDocumentScreen';
 import NotificationsScreen from '../screens/Notifications/NotificationsScreen';
+import MaintenancesScreen from '../screens/Maintenances/MaintenancesScreen';
+import CreateMaintenanceScreen from '../screens/Maintenances/CreateMaintenanceScreen';
+import MaintenanceDetailScreen from '../screens/Maintenances/MaintenanceDetailScreen';
 
 const MainNavigator = () => <MainTabs />;
 

@@ -31,6 +31,7 @@ const notificationSchema = new mongoose.Schema({
       'visitor',              // Novo visitante
       'visitor_arrived',      // Visitante chegou
       'document',             // Novo documento/regra
+      'maintenance',          // Nova manutenção
       'general'               // Notificação geral
     ],
     default: 'general'

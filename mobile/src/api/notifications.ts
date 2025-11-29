@@ -19,6 +19,7 @@ export interface Notification {
     | 'visitor'
     | 'visitor_arrived'
     | 'document'
+    | 'maintenance'
     | 'general';
   data: Record<string, any>;
   read: boolean;

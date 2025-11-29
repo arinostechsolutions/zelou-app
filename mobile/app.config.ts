@@ -10,7 +10,7 @@ const withTrailingSlash = (value: string) => (value.endsWith('/') ? value : `${v
 
 const ENV_SETTINGS: Record<EnvName, { apiBase: string }> = {
   development: {
-    apiBase: withTrailingSlash(process.env.LOCAL_API_BASE ?? 'http://192.168.1.73:3000/'),
+    apiBase: withTrailingSlash(process.env.LOCAL_API_BASE ?? 'http://192.168.1.64:3000/'),
   },
   staging: {
     apiBase: withTrailingSlash('https://your-staging-api.com/'),
@@ -47,7 +47,6 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     orientation: 'portrait',
     icon: './assets/icon.png',
     userInterfaceStyle: 'light',
-    newArchEnabled: false,
     splash: {
       image: './assets/splash-icon.png',
       resizeMode: 'contain',

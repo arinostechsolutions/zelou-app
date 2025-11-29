@@ -1,16 +1,20 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert, Platform, Switch } from 'react-native';
 import { useAuth } from '../../contexts/AuthContext';
+import { useTheme } from '../../contexts/ThemeContext';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Animated, { FadeInDown } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
+import { getListItemAnimation } from '../../utils/animations';
 
 const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
+const AnimatedView = Animated.createAnimatedComponent(View);
 
 const ProfileScreen = () => {
   const { user, logout } = useAuth();
+  const { colors } = useTheme();
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
 
@@ -54,37 +58,7 @@ const ProfileScreen = () => {
       icon: 'person-outline' as keyof typeof Ionicons.glyphMap,
       label: 'Editar Dados Pessoais',
       color: '#6366F1',
-      onPress: () => {},
-    },
-    {
-      icon: 'notifications-outline' as keyof typeof Ionicons.glyphMap,
-      label: 'Notificações',
-      color: '#F59E0B',
-      onPress: () => {},
-    },
-    {
-      icon: 'document-text-outline' as keyof typeof Ionicons.glyphMap,
-      label: 'Documentos do Condomínio',
-      color: '#10B981',
-      onPress: () => navigation.navigate('Home' as never, { 
-        screen: 'Documents', 
-        params: { type: 'document' } 
-      } as never),
-    },
-    {
-      icon: 'list-outline' as keyof typeof Ionicons.glyphMap,
-      label: 'Regras',
-      color: '#8B5CF6',
-      onPress: () => navigation.navigate('Home' as never, { 
-        screen: 'Documents', 
-        params: { type: 'rule' } 
-      } as never),
-    },
-    {
-      icon: 'help-circle-outline' as keyof typeof Ionicons.glyphMap,
-      label: 'Suporte',
-      color: '#06B6D4',
-      onPress: () => {},
+      onPress: () => navigation.navigate('EditProfile' as never),
     },
   ];
 
@@ -97,7 +71,7 @@ const ProfileScreen = () => {
       >
         <View style={styles.header}>
           <LinearGradient
-            colors={['#6366F1', '#8B5CF6', '#A855F7']}
+            colors={[colors.headerGradientStart, colors.headerGradientMiddle, colors.headerGradientEnd]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={[styles.gradient, { paddingTop: insets.top + 16 }]}
@@ -115,7 +89,7 @@ const ProfileScreen = () => {
                 <View style={styles.infoItem}>
                   <Ionicons name="home-outline" size={16} color="#E0E7FF" />
                   <Text style={styles.infoText}>
-                    {user?.unit.block} - {user?.unit.number}
+                    {user?.unit?.block ? `${user.unit.block} - ` : ''}{user?.unit?.number}
                   </Text>
                 </View>
               </View>
@@ -127,7 +101,7 @@ const ProfileScreen = () => {
           {menuItems.map((item, index) => (
             <AnimatedTouchableOpacity
               key={item.label}
-              entering={FadeInDown.delay(index * 50).springify().damping(15)}
+              entering={getListItemAnimation(index, 50)}
               style={styles.menuItem}
               onPress={item.onPress}
               activeOpacity={0.7}
@@ -140,8 +114,75 @@ const ProfileScreen = () => {
             </AnimatedTouchableOpacity>
           ))}
 
+          {/* TODO: Reativar seção de Aparência quando implementar dark mode
+          <AnimatedView
+            entering={getListItemAnimation(menuItems.length, 50)}
+            style={[styles.themeSection, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}
+          >
+            <View style={styles.themeSectionHeader}>
+              <View style={[styles.iconContainer, { backgroundColor: isDark ? '#A78BFA20' : '#6366F120' }]}>
+                <Ionicons name={isDark ? 'moon' : 'sunny'} size={26} color={isDark ? '#A78BFA' : '#F59E0B'} />
+              </View>
+              <Text style={[styles.menuItemText, { color: colors.text }]}>Aparência</Text>
+            </View>
+            
+            <View style={styles.themeOptions}>
+              <TouchableOpacity
+                style={[
+                  styles.themeOption,
+                  { backgroundColor: colors.backgroundTertiary },
+                  themeMode === 'light' && styles.themeOptionActive,
+                  themeMode === 'light' && { borderColor: colors.primary }
+                ]}
+                onPress={() => setThemeMode('light')}
+                activeOpacity={0.7}
+              >
+                <Ionicons name="sunny" size={20} color={themeMode === 'light' ? colors.primary : colors.textSecondary} />
+                <Text style={[
+                  styles.themeOptionText,
+                  { color: themeMode === 'light' ? colors.primary : colors.textSecondary }
+                ]}>Claro</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.themeOption,
+                  { backgroundColor: colors.backgroundTertiary },
+                  themeMode === 'dark' && styles.themeOptionActive,
+                  themeMode === 'dark' && { borderColor: colors.primary }
+                ]}
+                onPress={() => setThemeMode('dark')}
+                activeOpacity={0.7}
+              >
+                <Ionicons name="moon" size={20} color={themeMode === 'dark' ? colors.primary : colors.textSecondary} />
+                <Text style={[
+                  styles.themeOptionText,
+                  { color: themeMode === 'dark' ? colors.primary : colors.textSecondary }
+                ]}>Escuro</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.themeOption,
+                  { backgroundColor: colors.backgroundTertiary },
+                  themeMode === 'system' && styles.themeOptionActive,
+                  themeMode === 'system' && { borderColor: colors.primary }
+                ]}
+                onPress={() => setThemeMode('system')}
+                activeOpacity={0.7}
+              >
+                <Ionicons name="phone-portrait" size={20} color={themeMode === 'system' ? colors.primary : colors.textSecondary} />
+                <Text style={[
+                  styles.themeOptionText,
+                  { color: themeMode === 'system' ? colors.primary : colors.textSecondary }
+                ]}>Sistema</Text>
+              </TouchableOpacity>
+            </View>
+          </AnimatedView>
+          */}
+
           <AnimatedTouchableOpacity
-            entering={FadeInDown.delay(menuItems.length * 50).springify().damping(15)}
+            entering={getListItemAnimation(menuItems.length, 50)}
             style={[styles.menuItem, styles.logoutItem]}
             onPress={handleLogout}
             activeOpacity={0.7}
@@ -255,7 +296,50 @@ const styles = StyleSheet.create({
     borderColor: '#FEE2E2',
   },
   logoutText: {
-    color: '#EF4444',
+    fontWeight: '600',
+  },
+  themeSection: {
+    padding: 20,
+    borderRadius: 20,
+    borderWidth: 2,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.15,
+        shadowRadius: 12,
+      },
+      android: {
+        elevation: 8,
+      },
+    }),
+  },
+  themeSectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  themeOptions: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  themeOption: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: 'transparent',
+    gap: 6,
+  },
+  themeOptionActive: {
+    borderWidth: 2,
+  },
+  themeOptionText: {
+    fontSize: 13,
     fontWeight: '600',
   },
 });

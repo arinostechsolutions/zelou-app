@@ -11,12 +11,11 @@ export interface RegisterRequest {
   password: string;
   cpf: string;
   phone: string;
-  role: 'morador' | 'porteiro' | 'zelador' | 'sindico';
   unit: {
-    block: string;
+    block?: string;  // Opcional - alguns condomínios não têm blocos/torres
     number: string;
   };
-  inviteCode?: string;
+  inviteCode: string;  // Obrigatório - define o condomínio e role
 }
 
 export interface AuthResponse {
@@ -27,7 +26,7 @@ export interface AuthResponse {
     email: string;
     role: string;
     unit: {
-      block: string;
+      block?: string;
       number: string;
     };
     condominium?: {
@@ -43,8 +42,10 @@ export const authApi = {
   login: (data: LoginRequest) => api.post<AuthResponse>('/auth/login', data),
   register: (data: RegisterRequest) => api.post<AuthResponse>('/auth/register', data),
   forgotPassword: (email: string) => api.post('/auth/forgot-password', { email }),
-  resetPassword: (token: string, password: string) => 
-    api.post('/auth/reset-password', { token, password }),
+  verifyResetCode: (email: string, code: string) => 
+    api.post('/auth/verify-reset-code', { email, code }),
+  resetPassword: (email: string, code: string, password: string) => 
+    api.post('/auth/reset-password', { email, code, password }),
   getMe: () => api.get('/auth/me'),
 };
 
