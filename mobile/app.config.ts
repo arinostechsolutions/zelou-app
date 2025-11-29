@@ -13,10 +13,10 @@ const ENV_SETTINGS: Record<EnvName, { apiBase: string }> = {
     apiBase: withTrailingSlash(process.env.LOCAL_API_BASE ?? 'http://192.168.1.64:3000/'),
   },
   staging: {
-    apiBase: withTrailingSlash('https://your-staging-api.com/'),
+    apiBase: withTrailingSlash('https://zelou-app-production.up.railway.app/'),
   },
   production: {
-    apiBase: withTrailingSlash('https://your-production-api.com/'),
+    apiBase: withTrailingSlash('https://zelou-app-production.up.railway.app/'),
   },
 };
 
