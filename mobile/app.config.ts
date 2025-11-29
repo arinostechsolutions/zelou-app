@@ -36,7 +36,9 @@ const buildApiUrls = (env: EnvName) => {
 };
 
 export default ({ config }: ConfigContext): ExpoConfig => {
-  const env = (process.env.APP_ENV as EnvName) ?? 'development';
+  // EAS Build define EAS_BUILD=true durante a build
+  const isEasBuild = process.env.EAS_BUILD === 'true';
+  const env = (process.env.APP_ENV as EnvName) ?? (isEasBuild ? 'production' : 'development');
   const apiUrls = buildApiUrls(env);
 
   return {
@@ -58,6 +60,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       infoPlist: {
         NSCameraUsageDescription: 'Este app precisa da câmera para tirar fotos de entregas e irregularidades.',
         NSPhotoLibraryUsageDescription: 'Este app precisa acessar suas fotos para anexar imagens.',
+        ITSAppUsesNonExemptEncryption: false,
       },
     },
     android: {
