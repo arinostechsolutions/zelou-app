@@ -83,7 +83,7 @@ const LoginScreen = () => {
           style={styles.headerContent}
         >
           <Image 
-            source={require('../../../assets/icon.png')} 
+            source={require('../../../assets/icon-2.png')} 
             style={styles.logo}
             resizeMode="contain"
           />

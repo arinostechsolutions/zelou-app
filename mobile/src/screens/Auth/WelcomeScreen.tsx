@@ -49,7 +49,7 @@ const WelcomeScreen = () => {
           style={styles.logoSection}
         >
           <Image 
-            source={require('../../../assets/icon.png')} 
+            source={require('../../../assets/icon-2.png')} 
             style={styles.logo}
             resizeMode="contain"
           />
