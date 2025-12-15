@@ -9,13 +9,15 @@ Backend REST API para aplicativo de gestão de condomínio.
 npm install
 ```
 
-2. Criar arquivo `.env` baseado em `.env.example`:
+2. Criar arquivo `.env.development` baseado em `env.template`:
 ```
-PORT=3000
-MONGODB_URI=mongodb://localhost:27017/zelou
-JWT_SECRET=your_secret_key_here
 NODE_ENV=development
+PORT=3000
+MONGODB_URI=mongodb+srv://SEU_USUARIO:SUA_SENHA@SEU_CLUSTER.mongodb.net/zelou-dev?retryWrites=true&w=majority
+JWT_SECRET=your_secret_key_here
 ```
+
+**Importante:** Use `zelou-dev` como nome do database para desenvolvimento e `zelou-prod` para produção. Ambos podem usar o mesmo cluster do MongoDB Atlas!
 
 3. Iniciar servidor:
 ```bash

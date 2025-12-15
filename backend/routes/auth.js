@@ -43,11 +43,22 @@ router.post('/register', [
       .populate('condominium');
     
     if (!inviteCode) {
-      return res.status(400).json({ message: 'Código de convite inválido' });
+      return res.status(400).json({ message: 'Código de convite inválido. Entre em contato com o síndico ou zelador do seu condomínio.' });
     }
     
-    if (!inviteCode.isValid()) {
-      return res.status(400).json({ message: 'Código de convite expirado ou já utilizado' });
+    // Verificar se o código está ativo
+    if (!inviteCode.isActive) {
+      return res.status(400).json({ message: 'Este código de convite está inativo. Entre em contato com o síndico ou zelador do seu condomínio.' });
+    }
+    
+    // Verificar se o código expirou
+    if (inviteCode.expiresAt && inviteCode.expiresAt < new Date()) {
+      return res.status(400).json({ message: 'Este código de convite expirou. Entre em contato com o síndico ou zelador do seu condomínio para obter um novo código.' });
+    }
+    
+    // Verificar se o código atingiu o limite de usos
+    if (inviteCode.usedCount >= inviteCode.maxUses) {
+      return res.status(400).json({ message: 'O limite de uso deste código de convite foi excedido. Entre em contato com o síndico ou zelador do seu condomínio para obter um novo código.' });
     }
     
     // Verificar se bloco/unidade correspondem ao código (se especificados)

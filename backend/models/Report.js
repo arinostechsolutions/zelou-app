@@ -47,6 +47,10 @@ const reportSchema = new mongoose.Schema({
     enum: ['aberta', 'andamento', 'concluida'],
     default: 'aberta'
   },
+  isAnonymous: {
+    type: Boolean,
+    default: false
+  },
   history: [historyEntrySchema],
   createdAt: {
     type: Date,

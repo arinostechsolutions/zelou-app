@@ -7,8 +7,50 @@ const { createNotification } = require('../utils/pushNotifications');
 
 const router = express.Router();
 
+// Helper para ocultar dados anônimos em relatórios
+const anonymizeReport = (report, viewerUserId) => {
+  if (!report.isAnonymous) {
+    return report;
+  }
+
+  const reportObj = typeof report.toObject === 'function' ? report.toObject() : report;
+  const creatorId = reportObj.userId._id.toString();
+  const isCreator = viewerUserId && creatorId === viewerUserId.toString();
+
+  // Se for o próprio criador, não ocultar nada
+  if (isCreator) {
+    return reportObj;
+  }
+
+  // Ocultar dados do criador
+  reportObj.userId = {
+    _id: reportObj.userId._id,
+    name: 'Anônimo',
+    unit: {}
+  };
+
+  // Ocultar nome no histórico quando o changedBy é o criador
+  if (reportObj.history && Array.isArray(reportObj.history)) {
+    reportObj.history = reportObj.history.map(entry => {
+      if (entry.changedBy && entry.changedBy._id.toString() === creatorId) {
+        return {
+          ...entry,
+          changedBy: {
+            _id: entry.changedBy._id,
+            name: 'Anônimo',
+            role: entry.changedBy.role || ''
+          }
+        };
+      }
+      return entry;
+    });
+  }
+
+  return reportObj;
+};
+
 // Helper para notificar gestores (porteiro, zelador, síndico) sobre nova irregularidade
-const notifyManagersAboutReport = async (condominiumId, report, creatorName) => {
+const notifyManagersAboutReport = async (condominiumId, report, creatorName, isAnonymous) => {
   try {
     const managers = await User.find({
       condominium: condominiumId,
@@ -16,7 +58,8 @@ const notifyManagersAboutReport = async (condominiumId, report, creatorName) => 
     }).select('_id');
 
     const title = '🚨 Nova Irregularidade';
-    const body = `${creatorName} registrou: ${report.category} - ${report.location}`;
+    const displayName = isAnonymous ? 'Anônimo' : creatorName;
+    const body = `${displayName} registrou: ${report.category} - ${report.location}`;
 
     for (const manager of managers) {
       await createNotification(
@@ -56,7 +99,10 @@ router.get('/', auth, async (req, res) => {
       .populate('history.changedBy', 'name role')
       .sort({ createdAt: -1 });
 
-    res.json(reports);
+    // Ocultar dados anônimos nos resultados
+    const anonymizedReports = reports.map(report => anonymizeReport(report, req.user._id));
+
+    res.json(anonymizedReports);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Erro ao buscar irregularidades', error: error.message });
@@ -76,7 +122,7 @@ router.post('/', [auth, isMorador], [
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { photos, category, description, location } = req.body;
+    const { photos, category, description, location, isAnonymous } = req.body;
 
     const report = new Report({
       userId: req.user._id,
@@ -84,6 +130,7 @@ router.post('/', [auth, isMorador], [
       category,
       description,
       location,
+      isAnonymous: isAnonymous || false,
       status: 'aberta',
       history: [{
         status: 'aberta',
@@ -99,10 +146,16 @@ router.post('/', [auth, isMorador], [
     await notifyManagersAboutReport(
       req.user.condominium._id,
       report,
-      req.user.name
+      req.user.name,
+      report.isAnonymous || false
     );
 
-    res.status(201).json(report);
+    await report.populate('history.changedBy', 'name role');
+
+    // Ocultar dados anônimos se necessário (o criador sempre vê seus próprios dados)
+    const anonymizedReport = anonymizeReport(report, req.user._id);
+
+    res.status(201).json(anonymizedReport);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Erro ao criar irregularidade', error: error.message });
@@ -112,7 +165,7 @@ router.post('/', [auth, isMorador], [
 // GET /api/reports/:id
 router.get('/:id', auth, async (req, res) => {
   try {
-    const report = await Report.findById(req.params.id)
+    let report = await Report.findById(req.params.id)
       .populate('userId', 'name unit')
       .populate('history.changedBy', 'name role');
 
@@ -125,7 +178,10 @@ router.get('/:id', auth, async (req, res) => {
       return res.status(403).json({ message: 'Acesso negado' });
     }
 
-    res.json(report);
+    // Ocultar dados anônimos se necessário
+    const anonymizedReport = anonymizeReport(report, req.user._id);
+
+    res.json(anonymizedReport);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Erro ao buscar irregularidade', error: error.message });
@@ -163,6 +219,9 @@ router.put('/:id/status', [auth, isZelador], [
     await report.populate('userId', 'name unit');
     await report.populate('history.changedBy', 'name role');
 
+    // Ocultar dados anônimos se necessário
+    const anonymizedReport = anonymizeReport(report, req.user._id);
+
     // Notificar o morador que criou a irregularidade sobre a atualização
     const statusLabels = {
       'aberta': 'Aberta',
@@ -178,7 +237,7 @@ router.put('/:id/status', [auth, isZelador], [
       { reportId: report._id.toString() }
     );
 
-    res.json(report);
+    res.json(anonymizedReport);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Erro ao atualizar status', error: error.message });
@@ -219,7 +278,10 @@ router.post('/:id/comment', auth, [
     await report.populate('userId', 'name unit');
     await report.populate('history.changedBy', 'name role');
 
-    res.json(report);
+    // Ocultar dados anônimos se necessário
+    const anonymizedReport = anonymizeReport(report, req.user._id);
+
+    res.json(anonymizedReport);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Erro ao adicionar comentário', error: error.message });

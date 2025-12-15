@@ -1,7 +1,21 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-require('dotenv').config();
+const path = require('path');
+const fs = require('fs');
+const dotenv = require('dotenv');
+
+// Carrega o arquivo .env baseado no NODE_ENV
+const nodeEnv = process.env.NODE_ENV || 'development';
+const envFile = `.env.${nodeEnv}`;
+const envPath = path.resolve(process.cwd(), envFile);
+
+// Tenta carregar o arquivo específico do ambiente, se não existir, carrega o .env padrão
+dotenv.config({ path: envPath });
+if (!fs.existsSync(envPath)) {
+  console.log(`Arquivo ${envFile} não encontrado, carregando .env padrão`);
+  dotenv.config(); // Fallback para .env padrão
+}
 
 const app = express();
 
@@ -13,7 +27,11 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 // Database connection
 const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/zelou';
 mongoose.connect(mongoUri)
-.then(() => console.log('MongoDB conectado'))
+.then(() => {
+  const dbName = mongoose.connection.db.databaseName;
+  console.log(`MongoDB conectado: ${mongoose.connection.host}`);
+  console.log(`Database: ${dbName}`);
+})
 .catch(err => console.error('Erro ao conectar MongoDB:', err));
 
 // Routes
@@ -30,6 +48,7 @@ app.use('/api/documents', require('./routes/documents'));
 app.use('/api/upload', require('./routes/upload'));
 app.use('/api/notifications', require('./routes/notifications'));
 app.use('/api/maintenances', require('./routes/maintenances'));
+app.use('/api/statistics', require('./routes/statistics'));
 
 // Health check
 app.get('/api/health', (req, res) => {
