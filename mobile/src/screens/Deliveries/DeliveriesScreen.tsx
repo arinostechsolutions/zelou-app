@@ -8,6 +8,7 @@ import {
   RefreshControl,
   Image,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../../contexts/AuthContext';
@@ -27,7 +28,7 @@ const DeliveriesScreen = () => {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const [deliveries, setDeliveries] = useState<Delivery[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'pendente' | 'retirada'>('all');
 
   const loadDeliveries = async () => {
@@ -167,26 +168,32 @@ const DeliveriesScreen = () => {
         </TouchableOpacity>
       </View>
 
-      <FlatList
-        data={deliveries}
-        renderItem={renderItem}
-        keyExtractor={(item) => item._id}
-        refreshControl={
-          <RefreshControl 
-            refreshing={loading} 
-            onRefresh={loadDeliveries}
-            tintColor={colors.primary}
-            colors={[colors.primary]}
-          />
-        }
-        contentContainerStyle={styles.list}
-        ListEmptyComponent={
-          <View style={styles.empty}>
-            <Ionicons name="cube-outline" size={64} color={colors.textTertiary} />
-            <Text style={[styles.emptyText, { color: colors.textSecondary }]}>Nenhuma entrega encontrada</Text>
-          </View>
-        }
-      />
+      {loading && deliveries.length === 0 ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
+      ) : (
+        <FlatList
+          data={deliveries}
+          renderItem={renderItem}
+          keyExtractor={(item) => item._id}
+          refreshControl={
+            <RefreshControl 
+              refreshing={loading} 
+              onRefresh={loadDeliveries}
+              tintColor={colors.primary}
+              colors={[colors.primary]}
+            />
+          }
+          contentContainerStyle={styles.list}
+          ListEmptyComponent={
+            <View style={styles.empty}>
+              <Ionicons name="cube-outline" size={64} color={colors.textTertiary} />
+              <Text style={[styles.emptyText, { color: colors.textSecondary }]}>Nenhuma entrega encontrada</Text>
+            </View>
+          }
+        />
+      )}
 
       {/* FAB - Botão de adicionar entrega */}
       {(user?.role === 'porteiro' || user?.role === 'zelador' || user?.role === 'sindico') && (
@@ -387,6 +394,12 @@ const styles = StyleSheet.create({
   },
   chevron: {
     marginLeft: 8,
+  },
+  loadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 80,
   },
   empty: {
     padding: 60,

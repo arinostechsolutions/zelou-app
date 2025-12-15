@@ -8,8 +8,9 @@ import {
   ScrollView,
   ActivityIndicator,
   Platform,
+  Modal,
 } from 'react-native';
-import { Calendar, DateData } from 'react-native-calendars';
+import { Calendar, DateData, LocaleConfig } from 'react-native-calendars';
 import { useNavigation } from '@react-navigation/native';
 import { reservationsApi, Area, AvailabilityResponse, DayAvailability } from '../../api/reservations';
 import { Ionicons } from '@expo/vector-icons';
@@ -21,6 +22,51 @@ import { formatDateLong } from '../../utils/dateFormat';
 import { getListItemAnimation } from '../../utils/animations';
 
 const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
+
+// Configurar locale para português brasileiro
+LocaleConfig.locales['pt-BR'] = {
+  monthNames: [
+    'Janeiro',
+    'Fevereiro',
+    'Março',
+    'Abril',
+    'Maio',
+    'Junho',
+    'Julho',
+    'Agosto',
+    'Setembro',
+    'Outubro',
+    'Novembro',
+    'Dezembro'
+  ],
+  monthNamesShort: [
+    'Jan',
+    'Fev',
+    'Mar',
+    'Abr',
+    'Mai',
+    'Jun',
+    'Jul',
+    'Ago',
+    'Set',
+    'Out',
+    'Nov',
+    'Dez'
+  ],
+  dayNames: [
+    'Domingo',
+    'Segunda-feira',
+    'Terça-feira',
+    'Quarta-feira',
+    'Quinta-feira',
+    'Sexta-feira',
+    'Sábado'
+  ],
+  dayNamesShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'],
+  today: 'Hoje'
+};
+
+LocaleConfig.defaultLocale = 'pt-BR';
 
 const CreateReservationScreen = () => {
   const navigation = useNavigation();
@@ -35,6 +81,8 @@ const CreateReservationScreen = () => {
   const [loadingAvailability, setLoadingAvailability] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth() + 1);
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+  const [successModalVisible, setSuccessModalVisible] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
     loadAreas();
@@ -152,9 +200,8 @@ const CreateReservationScreen = () => {
         ? 'Sua solicitação foi enviada e aguarda aprovação!'
         : 'Reserva confirmada com sucesso!';
       
-      Alert.alert('Sucesso', message, [
-        { text: 'OK', onPress: () => navigation.goBack() }
-      ]);
+      setSuccessMessage(message);
+      setSuccessModalVisible(true);
     } catch (error: any) {
       Alert.alert('Erro', error.response?.data?.message || 'Erro ao criar reserva');
     } finally {
@@ -438,6 +485,42 @@ const CreateReservationScreen = () => {
           </View>
         )}
       </ScrollView>
+
+      {/* Modal de Sucesso */}
+      <Modal
+        visible={successModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => {
+          setSuccessModalVisible(false);
+          navigation.goBack();
+        }}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Ionicons name="checkmark-circle" size={60} color="#10B981" />
+            <Text style={styles.modalTitle}>Sucesso!</Text>
+            <Text style={styles.modalMessage}>{successMessage}</Text>
+            <TouchableOpacity
+              style={styles.modalButton}
+              onPress={() => {
+                setSuccessModalVisible(false);
+                navigation.goBack();
+              }}
+              activeOpacity={0.8}
+            >
+              <LinearGradient
+                colors={['#6366F1', '#8B5CF6']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.modalButtonGradient}
+              >
+                <Text style={styles.modalButtonText}>OK</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -691,6 +774,63 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   submitButtonText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+  // Modal Styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 24,
+    padding: 32,
+    alignItems: 'center',
+    width: '100%',
+    maxWidth: 400,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.15,
+        shadowRadius: 12,
+      },
+      android: {
+        elevation: 8,
+      },
+    }),
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#1E293B',
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  modalMessage: {
+    fontSize: 16,
+    color: '#475569',
+    textAlign: 'center',
+    marginBottom: 30,
+    lineHeight: 24,
+  },
+  modalButton: {
+    width: '100%',
+    borderRadius: 16,
+    overflow: 'hidden',
+    marginTop: 10,
+  },
+  modalButtonGradient: {
+    paddingVertical: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalButtonText: {
     fontSize: 16,
     fontWeight: '700',
     color: '#FFFFFF',

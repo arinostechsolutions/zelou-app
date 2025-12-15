@@ -74,6 +74,8 @@ const HomeStack = () => (
     <Stack.Screen name="Maintenances" component={MaintenancesScreen} />
     <Stack.Screen name="CreateMaintenance" component={CreateMaintenanceScreen} />
     <Stack.Screen name="MaintenanceDetail" component={MaintenanceDetailScreen} />
+    {/* Tela de Estatísticas */}
+    <Stack.Screen name="Statistics" component={StatisticsScreen} />
   </Stack.Navigator>
 );
 
@@ -166,9 +168,9 @@ const MainTabs = () => {
           backgroundColor: colors.tabBarBackground,
           borderTopWidth: 1,
           borderTopColor: colors.tabBarBorder,
-          height: Platform.OS === 'ios' ? 90 : 70,
-          paddingBottom: Platform.OS === 'ios' ? 30 : 12,
-          paddingTop: 10,
+          height: Platform.OS === 'ios' ? 90 : 62,
+          paddingBottom: Platform.OS === 'ios' ? 30 : 6,
+          paddingTop: 8,
           paddingHorizontal: 20,
           elevation: 0,
           shadowColor: 'transparent',
@@ -236,6 +238,7 @@ import NotificationsScreen from '../screens/Notifications/NotificationsScreen';
 import MaintenancesScreen from '../screens/Maintenances/MaintenancesScreen';
 import CreateMaintenanceScreen from '../screens/Maintenances/CreateMaintenanceScreen';
 import MaintenanceDetailScreen from '../screens/Maintenances/MaintenanceDetailScreen';
+import StatisticsScreen from '../screens/Admin/StatisticsScreen';
 
 const MainNavigator = () => <MainTabs />;
 

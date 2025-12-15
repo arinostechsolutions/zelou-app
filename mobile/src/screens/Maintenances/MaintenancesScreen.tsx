@@ -7,6 +7,7 @@ import {
   StyleSheet,
   RefreshControl,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
@@ -27,7 +28,7 @@ const MaintenancesScreen = () => {
   const insets = useSafeAreaInsets();
   
   const [maintenances, setMaintenances] = useState<Maintenance[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>('all');
 
   const canCreate = user?.role === 'sindico' || user?.role === 'zelador';
@@ -180,26 +181,32 @@ const MaintenancesScreen = () => {
         />
       </View>
 
-      <FlatList
-        data={maintenances}
-        renderItem={renderItem}
-        keyExtractor={(item) => item._id}
-        refreshControl={
-          <RefreshControl
-            refreshing={loading}
-            onRefresh={loadMaintenances}
-            tintColor="#6366F1"
-            colors={['#6366F1']}
-          />
-        }
-        contentContainerStyle={styles.list}
-        ListEmptyComponent={
-          <View style={styles.empty}>
-            <Ionicons name="construct-outline" size={64} color="#CBD5E1" />
-            <Text style={styles.emptyText}>Nenhuma manutenção encontrada</Text>
-          </View>
-        }
-      />
+      {loading && maintenances.length === 0 ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#6366F1" />
+        </View>
+      ) : (
+        <FlatList
+          data={maintenances}
+          renderItem={renderItem}
+          keyExtractor={(item) => item._id}
+          refreshControl={
+            <RefreshControl
+              refreshing={loading}
+              onRefresh={loadMaintenances}
+              tintColor="#6366F1"
+              colors={['#6366F1']}
+            />
+          }
+          contentContainerStyle={styles.list}
+          ListEmptyComponent={
+            <View style={styles.empty}>
+              <Ionicons name="construct-outline" size={64} color="#CBD5E1" />
+              <Text style={styles.emptyText}>Nenhuma manutenção encontrada</Text>
+            </View>
+          }
+        />
+      )}
 
       {/* FAB para criar manutenção */}
       {canCreate && (
@@ -369,6 +376,12 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#94A3B8',
     lineHeight: 18,
+  },
+  loadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 80,
   },
   empty: {
     padding: 60,

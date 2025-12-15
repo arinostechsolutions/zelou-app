@@ -37,6 +37,8 @@ const ReportDetailScreen = () => {
   const [updating, setUpdating] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [statusConfirmModalVisible, setStatusConfirmModalVisible] = useState(false);
+  const [pendingStatus, setPendingStatus] = useState<string>('');
 
   useEffect(() => {
     loadReport();
@@ -54,20 +56,46 @@ const ReportDetailScreen = () => {
     }
   };
 
-  const handleUpdateStatus = async () => {
+  const handleStatusChange = (value: string) => {
+    if (!report) return;
+    
+    // Se o status selecionado é diferente do atual, mostra a modal de confirmação
+    if (value !== report.status) {
+      setPendingStatus(value);
+      setStatusConfirmModalVisible(true);
+    } else {
+      // Se selecionou o status atual, apenas atualiza o estado
+      setNewStatus(value);
+    }
+  };
+
+  const handleConfirmStatusUpdate = async () => {
     if (!report) return;
 
     setUpdating(true);
+    setStatusConfirmModalVisible(false);
+    
     try {
-      await reportsApi.updateStatus(report._id, newStatus, comment || undefined);
-      Alert.alert('Sucesso', 'Status atualizado');
-      loadReport();
+      await reportsApi.updateStatus(report._id, pendingStatus, comment || undefined);
+      setNewStatus(pendingStatus);
       setComment('');
+      loadReport();
     } catch (error: any) {
       Alert.alert('Erro', error.response?.data?.message || 'Erro ao atualizar status');
+      // Reverte para o status anterior em caso de erro
+      setPendingStatus(report.status);
+      setNewStatus(report.status);
     } finally {
       setUpdating(false);
     }
+  };
+
+  const handleCancelStatusUpdate = () => {
+    if (!report) return;
+    // Reverte para o status atual
+    setNewStatus(report.status);
+    setPendingStatus('');
+    setStatusConfirmModalVisible(false);
   };
 
   const handleAddComment = async () => {
@@ -158,9 +186,10 @@ const ReportDetailScreen = () => {
         {report.photos && report.photos.length > 0 && (
           <View style={styles.photosSection}>
             <View style={styles.photosSectionHeader}>
-              <Text style={styles.photosSectionTitle}>
-                <Ionicons name="images-outline" size={18} color="#1E293B" /> Fotos da Ocorrência
-              </Text>
+              <View style={styles.photosSectionTitleContainer}>
+                <Ionicons name="images-outline" size={18} color="#1E293B" />
+                <Text style={styles.photosSectionTitle}> Fotos da Ocorrência</Text>
+              </View>
               <Text style={styles.photosCount}>{report.photos.length} foto(s)</Text>
             </View>
             <FlatList
@@ -220,8 +249,9 @@ const ReportDetailScreen = () => {
             <View style={styles.pickerContainer}>
               <Picker
                 selectedValue={newStatus}
-                onValueChange={setNewStatus}
+                onValueChange={handleStatusChange}
                 style={styles.picker}
+                enabled={!updating}
               >
                 <Picker.Item label="Aberta" value="aberta" />
                 <Picker.Item label="Em Andamento" value="andamento" />
@@ -235,29 +265,8 @@ const ReportDetailScreen = () => {
               value={comment}
               onChangeText={setComment}
               multiline
+              editable={!updating}
             />
-            <TouchableOpacity
-              style={[styles.updateButton, updating && styles.buttonDisabled]}
-              onPress={handleUpdateStatus}
-              disabled={updating}
-              activeOpacity={0.8}
-            >
-              <LinearGradient
-                colors={['#6366F1', '#8B5CF6']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.updateButtonGradient}
-              >
-                {updating ? (
-                  <ActivityIndicator color="#FFFFFF" />
-                ) : (
-                  <>
-                    <Ionicons name="refresh-outline" size={20} color="#FFFFFF" />
-                    <Text style={styles.updateButtonText}>Atualizar Status</Text>
-                  </>
-                )}
-              </LinearGradient>
-            </TouchableOpacity>
           </View>
         )}
 
@@ -314,6 +323,61 @@ const ReportDetailScreen = () => {
           </TouchableOpacity>
         </View>
       </ScrollView>
+
+      {/* Modal de Confirmação de Status */}
+      <Modal
+        visible={statusConfirmModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={handleCancelStatusUpdate}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={[styles.modalIconContainer, { backgroundColor: `${getStatusColor(pendingStatus)}20` }]}>
+              <Ionicons 
+                name={pendingStatus === 'concluida' ? 'checkmark-circle' : 'refresh'} 
+                size={48} 
+                color={getStatusColor(pendingStatus)} 
+              />
+            </View>
+            <Text style={styles.modalTitle}>Confirmar Alteração de Status</Text>
+            <Text style={styles.modalMessage}>
+              Deseja alterar o status desta irregularidade para{' '}
+              <Text style={[styles.modalStatusText, { color: getStatusColor(pendingStatus) }]}>
+                {getStatusLabel(pendingStatus)}
+              </Text>?
+            </Text>
+            <View style={styles.modalButtonContainer}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.modalCancelButton]}
+                onPress={handleCancelStatusUpdate}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.modalCancelButtonText}>Cancelar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.modalConfirmButton]}
+                onPress={handleConfirmStatusUpdate}
+                activeOpacity={0.8}
+                disabled={updating}
+              >
+                <LinearGradient
+                  colors={[getStatusColor(pendingStatus), getStatusColor(pendingStatus)]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.modalConfirmButtonGradient}
+                >
+                  {updating ? (
+                    <ActivityIndicator color="#FFFFFF" />
+                  ) : (
+                    <Text style={styles.modalConfirmButtonText}>Confirmar</Text>
+                  )}
+                </LinearGradient>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
 
       {/* Modal de Imagem em Tela Cheia */}
       <Modal
@@ -437,6 +501,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 12,
+  },
+  photosSectionTitleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   photosSectionTitle: {
     fontSize: 16,
@@ -698,6 +766,92 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 15,
     fontWeight: '600',
+  },
+  // Modal de Confirmação de Status
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 24,
+    padding: 32,
+    alignItems: 'center',
+    width: '100%',
+    maxWidth: 400,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.15,
+        shadowRadius: 12,
+      },
+      android: {
+        elevation: 8,
+      },
+    }),
+  },
+  modalIconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+  },
+  modalTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#1E293B',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  modalMessage: {
+    fontSize: 16,
+    color: '#475569',
+    textAlign: 'center',
+    marginBottom: 30,
+    lineHeight: 24,
+  },
+  modalStatusText: {
+    fontWeight: '700',
+  },
+  modalButtonContainer: {
+    flexDirection: 'row',
+    gap: 12,
+    width: '100%',
+  },
+  modalButton: {
+    flex: 1,
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  modalCancelButton: {
+    backgroundColor: '#E2E8F0',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+  },
+  modalCancelButtonText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#64748B',
+  },
+  modalConfirmButton: {
+    // Gradient handled by LinearGradient inside
+  },
+  modalConfirmButtonGradient: {
+    paddingVertical: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalConfirmButtonText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#FFFFFF',
   },
 });
 

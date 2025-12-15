@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   Alert,
   Platform,
+  Modal,
 } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
@@ -29,6 +30,7 @@ const EditUserScreen = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const [successModalVisible, setSuccessModalVisible] = useState(false);
 
   // Form fields
   const [name, setName] = useState('');
@@ -43,17 +45,35 @@ const EditUserScreen = () => {
     loadUser();
   }, [userId]);
 
+  const formatCPF = (value: string) => {
+    if (!value) return '';
+    const numbers = value.replace(/\D/g, '');
+    if (numbers.length <= 3) return numbers;
+    if (numbers.length <= 6) return `${numbers.slice(0, 3)}.${numbers.slice(3)}`;
+    if (numbers.length <= 9) return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(6)}`;
+    return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(6, 9)}-${numbers.slice(9, 11)}`;
+  };
+
+  const formatPhone = (value: string) => {
+    if (!value) return '';
+    const numbers = value.replace(/\D/g, '');
+    if (numbers.length <= 2) return numbers;
+    if (numbers.length <= 7) return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`;
+    return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7, 11)}`;
+  };
+
   const loadUser = async () => {
     try {
       const data = await usersApi.getById(userId);
       setUser(data);
-      setName(data.name);
-      setEmail(data.email);
-      setCpf(data.cpf);
-      setPhone(data.phone);
-      setRole(data.role);
-      setBlock(data.unit.block);
-      setUnitNumber(data.unit.number);
+      setName(data.name || '');
+      setEmail(data.email || '');
+      // Aplicar máscara ao carregar - tratar null/undefined
+      setCpf(data.cpf ? formatCPF(data.cpf) : '');
+      setPhone(data.phone ? formatPhone(data.phone) : '');
+      setRole(data.role || '');
+      setBlock(data.unit?.block || '');
+      setUnitNumber(data.unit?.number || '');
     } catch (error: any) {
       console.error('Erro ao carregar usuário:', error);
       Alert.alert('Erro', 'Não foi possível carregar os dados do usuário.');
@@ -64,25 +84,32 @@ const EditUserScreen = () => {
   };
 
   const handleSave = async () => {
-    // Validações
-    if (!name.trim()) {
+    // Validações - garantir que não são null/undefined
+    const nameValue = (name || '').trim();
+    const emailValue = (email || '').trim();
+    const cpfValue = (cpf || '').replace(/\D/g, '');
+    const phoneValue = (phone || '').replace(/\D/g, '');
+    const blockValue = (block || '').trim();
+    const unitNumberValue = (unitNumber || '').trim();
+    
+    if (!nameValue) {
       Alert.alert('Erro', 'Por favor, informe o nome.');
       return;
     }
-    if (!email.trim()) {
+    if (!emailValue) {
       Alert.alert('Erro', 'Por favor, informe o email.');
       return;
     }
-    if (!cpf.trim()) {
-      Alert.alert('Erro', 'Por favor, informe o CPF.');
+    if (!cpfValue || cpfValue.length !== 11) {
+      Alert.alert('Erro', 'Por favor, informe um CPF válido.');
       return;
     }
-    if (!phone.trim()) {
-      Alert.alert('Erro', 'Por favor, informe o telefone.');
+    if (!phoneValue || phoneValue.length < 10) {
+      Alert.alert('Erro', 'Por favor, informe um telefone válido.');
       return;
     }
     // Bloco é opcional - alguns condomínios não têm blocos/torres
-    if (!unitNumber.trim()) {
+    if (!unitNumberValue) {
       Alert.alert('Erro', 'Por favor, informe o número da unidade.');
       return;
     }
@@ -90,24 +117,19 @@ const EditUserScreen = () => {
     setSaving(true);
     try {
       const updatedData = {
-        name: name.trim(),
-        email: email.trim().toLowerCase(),
-        cpf: cpf.trim(),
-        phone: phone.trim(),
-        role,
+        name: nameValue,
+        email: emailValue.toLowerCase(),
+        cpf: cpfValue,
+        phone: phoneValue,
+        role: role || 'morador',
         unit: {
-          block: block.trim() || undefined,  // Opcional
-          number: unitNumber.trim(),
+          block: blockValue || undefined,  // Opcional
+          number: unitNumberValue,
         },
       };
 
       await usersApi.update(userId, updatedData);
-      Alert.alert('Sucesso', 'Usuário atualizado com sucesso!', [
-        {
-          text: 'OK',
-          onPress: () => navigation.goBack(),
-        },
-      ]);
+      setSuccessModalVisible(true);
     } catch (error: any) {
       console.error('Erro ao atualizar usuário:', error);
       Alert.alert(
@@ -228,10 +250,11 @@ const EditUserScreen = () => {
               <TextInput
                 style={styles.input}
                 value={cpf}
-                onChangeText={setCpf}
+                onChangeText={(text) => setCpf(formatCPF(text))}
                 placeholder="000.000.000-00"
                 placeholderTextColor="#94A3B8"
                 keyboardType="numeric"
+                maxLength={14}
               />
             </View>
           </View>
@@ -243,10 +266,11 @@ const EditUserScreen = () => {
               <TextInput
                 style={styles.input}
                 value={phone}
-                onChangeText={setPhone}
+                onChangeText={(text) => setPhone(formatPhone(text))}
                 placeholder="(00) 00000-0000"
                 placeholderTextColor="#94A3B8"
                 keyboardType="phone-pad"
+                maxLength={15}
               />
             </View>
           </View>
@@ -290,7 +314,7 @@ const EditUserScreen = () => {
 
           <View style={styles.row}>
             <View style={[styles.formGroup, styles.halfWidth]}>
-              <Text style={styles.label}>Bloco</Text>
+              <Text style={styles.label}>Bloco (opcional)</Text>
               <View style={styles.inputContainer}>
                 <Ionicons name="business-outline" size={20} color="#94A3B8" style={styles.inputIcon} />
                 <TextInput
@@ -344,6 +368,44 @@ const EditUserScreen = () => {
           </LinearGradient>
         </TouchableOpacity>
       </KeyboardAwareScrollView>
+
+      {/* Modal de Sucesso */}
+      <Modal
+        visible={successModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => {
+          setSuccessModalVisible(false);
+          navigation.goBack();
+        }}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.successIconContainer}>
+              <Ionicons name="checkmark-circle" size={64} color="#10B981" />
+            </View>
+            <Text style={styles.modalTitle}>Sucesso!</Text>
+            <Text style={styles.modalMessage}>Usuário atualizado com sucesso!</Text>
+            <TouchableOpacity
+              style={styles.modalButton}
+              onPress={() => {
+                setSuccessModalVisible(false);
+                navigation.goBack();
+              }}
+              activeOpacity={0.8}
+            >
+              <LinearGradient
+                colors={['#6366F1', '#8B5CF6']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.modalButtonGradient}
+              >
+                <Text style={styles.modalButtonText}>OK</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -475,6 +537,76 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   saveButtonText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 24,
+    padding: 32,
+    alignItems: 'center',
+    width: '100%',
+    maxWidth: 400,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.25,
+        shadowRadius: 12,
+      },
+      android: {
+        elevation: 8,
+      },
+    }),
+  },
+  successIconContainer: {
+    marginBottom: 20,
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#1E293B',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  modalMessage: {
+    fontSize: 16,
+    color: '#64748B',
+    textAlign: 'center',
+    marginBottom: 32,
+    lineHeight: 24,
+  },
+  modalButton: {
+    borderRadius: 12,
+    overflow: 'hidden',
+    width: '100%',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 3,
+      },
+    }),
+  },
+  modalButtonGradient: {
+    paddingVertical: 14,
+    paddingHorizontal: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalButtonText: {
     fontSize: 16,
     fontWeight: '700',
     color: '#FFFFFF',

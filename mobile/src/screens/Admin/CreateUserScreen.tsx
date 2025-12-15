@@ -361,7 +361,7 @@ const CreateUserScreen = () => {
           <View style={styles.row}>
             <View style={[styles.formGroup, styles.halfWidth]}>
               <Text style={styles.label}>
-                Bloco {role === 'morador' ? '*' : '(opcional)'}
+                Bloco (opcional)
               </Text>
               <View style={styles.inputContainer}>
                 <Ionicons name="business-outline" size={20} color="#94A3B8" style={styles.inputIcon} />

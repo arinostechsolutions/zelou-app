@@ -9,6 +9,7 @@ import {
   Alert,
   ActivityIndicator,
   Platform,
+  Modal,
 } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { formatDateTime } from '../../utils/dateFormat';
@@ -26,6 +27,7 @@ const DeliveryDetailScreen = () => {
   const [delivery, setDelivery] = useState<Delivery | null>(null);
   const [loading, setLoading] = useState(true);
   const [confirming, setConfirming] = useState(false);
+  const [confirmModalVisible, setConfirmModalVisible] = useState(false);
 
   useEffect(() => {
     loadDelivery();
@@ -42,31 +44,26 @@ const DeliveryDetailScreen = () => {
     }
   };
 
-  const handleConfirmRetrieval = async () => {
+  const handleConfirmRetrieval = () => {
+    if (!delivery) return;
+    setConfirmModalVisible(true);
+  };
+
+  const confirmRetrieval = async () => {
     if (!delivery) return;
 
-    Alert.alert(
-      'Confirmar Retirada',
-      'Deseja confirmar a retirada desta entrega?',
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        {
-          text: 'Confirmar',
-          onPress: async () => {
-            setConfirming(true);
-            try {
-              await deliveriesApi.confirmRetrieval(delivery._id);
-              Alert.alert('Sucesso', 'Retirada confirmada');
-              loadDelivery();
-            } catch (error: any) {
-              Alert.alert('Erro', error.response?.data?.message || 'Erro ao confirmar retirada');
-            } finally {
-              setConfirming(false);
-            }
-          },
-        },
-      ]
-    );
+    setConfirmModalVisible(false);
+    setConfirming(true);
+    
+    try {
+      await deliveriesApi.confirmRetrieval(delivery._id);
+      Alert.alert('Sucesso', 'Retirada confirmada');
+      loadDelivery();
+    } catch (error: any) {
+      Alert.alert('Erro', error.response?.data?.message || 'Erro ao confirmar retirada');
+    } finally {
+      setConfirming(false);
+    }
   };
 
   if (loading) {
@@ -252,6 +249,54 @@ const DeliveryDetailScreen = () => {
             </TouchableOpacity>
           )}
       </ScrollView>
+
+      {/* Modal de Confirmação de Retirada */}
+      <Modal
+        visible={confirmModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setConfirmModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={[styles.modalIconContainer, { backgroundColor: '#10B98120' }]}>
+              <Ionicons name="cube-outline" size={48} color="#10B981" />
+            </View>
+            <Text style={styles.modalTitle}>Confirmar Retirada</Text>
+            <Text style={styles.modalMessage}>Deseja confirmar a retirada desta entrega?</Text>
+            
+            <View style={styles.modalButtonContainer}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.modalCancelButton]}
+                onPress={() => setConfirmModalVisible(false)}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.modalCancelButtonText}>Cancelar</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity
+                style={[styles.modalButton, styles.modalConfirmButton]}
+                onPress={confirmRetrieval}
+                activeOpacity={0.8}
+                disabled={confirming}
+              >
+                <LinearGradient
+                  colors={['#10B981', '#059669']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.modalConfirmButtonGradient}
+                >
+                  {confirming ? (
+                    <ActivityIndicator color="#FFFFFF" />
+                  ) : (
+                    <Text style={styles.modalConfirmButtonText}>Confirmar</Text>
+                  )}
+                </LinearGradient>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -458,6 +503,89 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '700',
+  },
+  // Modal Styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 24,
+    padding: 32,
+    alignItems: 'center',
+    width: '100%',
+    maxWidth: 400,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.15,
+        shadowRadius: 12,
+      },
+      android: {
+        elevation: 8,
+      },
+    }),
+  },
+  modalIconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+  },
+  modalTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#1E293B',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  modalMessage: {
+    fontSize: 16,
+    color: '#475569',
+    textAlign: 'center',
+    marginBottom: 30,
+    lineHeight: 24,
+  },
+  modalButtonContainer: {
+    flexDirection: 'row',
+    gap: 12,
+    width: '100%',
+  },
+  modalButton: {
+    flex: 1,
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  modalCancelButton: {
+    backgroundColor: '#E2E8F0',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+  },
+  modalCancelButtonText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#64748B',
+  },
+  modalConfirmButton: {
+    // Gradient handled by LinearGradient inside
+  },
+  modalConfirmButtonGradient: {
+    paddingVertical: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalConfirmButtonText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#FFFFFF',
   },
 });
 

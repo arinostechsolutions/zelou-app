@@ -1,16 +1,33 @@
 import { ExpoConfig, ConfigContext } from '@expo/config';
 import dotenv from 'dotenv';
+import * as path from 'path';
+import * as fs from 'fs';
 
-// Carregar variáveis do .env
-dotenv.config();
+// Carregar variáveis do .env - especificar caminho explícito
+const envPath = path.resolve(process.cwd(), '.env');
+if (fs.existsSync(envPath)) {
+  const result = dotenv.config({ path: envPath });
+  if (result.error) {
+    console.warn('⚠️ Erro ao carregar .env:', result.error);
+  }
+}
+
+// Debug: log das variáveis de ambiente
+console.log('🔍 process.env.LOCAL_API_BASE:', process.env.LOCAL_API_BASE);
+console.log('🔍 envPath:', envPath);
+console.log('🔍 fs.existsSync(envPath):', fs.existsSync(envPath));
 
 type EnvName = 'development' | 'staging' | 'production';
 
 const withTrailingSlash = (value: string) => (value.endsWith('/') ? value : `${value}/`);
 
+// Para emulador Android, use 10.0.2.2 se LOCAL_API_BASE não estiver definido
+// Para dispositivo físico na rede, use o IP da máquina (ex: 192.168.1.64)
+const defaultApiBase = process.env.LOCAL_API_BASE || 'http://10.0.2.2:3000/';
+
 const ENV_SETTINGS: Record<EnvName, { apiBase: string }> = {
   development: {
-    apiBase: withTrailingSlash(process.env.LOCAL_API_BASE ?? 'http://192.168.1.64:3000/'),
+    apiBase: withTrailingSlash(defaultApiBase),
   },
   staging: {
     apiBase: withTrailingSlash('https://zelou-app-production.up.railway.app/'),
@@ -45,7 +62,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     ...config,
     name: 'Zelou',
     slug: 'zelou',
-    version: '1.0.1',
+    version: '1.0.2',
     orientation: 'portrait',
     icon: './assets/icon.png',
     userInterfaceStyle: 'light',
@@ -97,12 +114,11 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         {
           android: {
             compileSdkVersion: 35,
-            targetSdkVersion: 35,
           },
         },
       ],
     ],
-    runtimeVersion: '1.0.1',
+    runtimeVersion: '1.0.2',
   };
 };
 

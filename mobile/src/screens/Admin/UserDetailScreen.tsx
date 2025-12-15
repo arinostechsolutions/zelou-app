@@ -112,6 +112,23 @@ const UserDetailScreen = () => {
     return colors[role] || '#64748B';
   };
 
+  const formatCPF = (value: string) => {
+    if (!value) return '';
+    const numbers = value.replace(/\D/g, '');
+    if (numbers.length <= 3) return numbers;
+    if (numbers.length <= 6) return `${numbers.slice(0, 3)}.${numbers.slice(3)}`;
+    if (numbers.length <= 9) return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(6)}`;
+    return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(6, 9)}-${numbers.slice(9, 11)}`;
+  };
+
+  const formatPhone = (value: string) => {
+    if (!value) return '';
+    const numbers = value.replace(/\D/g, '');
+    if (numbers.length <= 2) return numbers;
+    if (numbers.length <= 7) return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`;
+    return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7, 11)}`;
+  };
+
   if (loading) {
     return (
       <View style={styles.centerContainer}>
@@ -197,7 +214,7 @@ const UserDetailScreen = () => {
             </View>
             <View style={styles.infoContent}>
               <Text style={styles.infoLabel}>CPF</Text>
-              <Text style={styles.infoValue}>{user.cpf}</Text>
+              <Text style={styles.infoValue}>{formatCPF(user.cpf)}</Text>
             </View>
           </View>
 
@@ -209,7 +226,7 @@ const UserDetailScreen = () => {
             </View>
             <View style={styles.infoContent}>
               <Text style={styles.infoLabel}>Telefone</Text>
-              <Text style={styles.infoValue}>{user.phone}</Text>
+              <Text style={styles.infoValue}>{formatPhone(user.phone)}</Text>
             </View>
           </View>
         </AnimatedTouchableOpacity>

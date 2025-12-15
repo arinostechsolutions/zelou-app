@@ -31,7 +31,7 @@ const ReservationsScreen = () => {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const [reservations, setReservations] = useState<Reservation[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'pendente' | 'aprovada'>('all');
   const [processingId, setProcessingId] = useState<string | null>(null);
   
@@ -323,26 +323,32 @@ const ReservationsScreen = () => {
         </View>
       )}
 
-      <FlatList
-        data={reservations}
-        renderItem={renderItem}
-        keyExtractor={(item) => item._id}
-        refreshControl={
-          <RefreshControl
-            refreshing={loading}
-            onRefresh={loadReservations}
-            tintColor="#6366F1"
-            colors={['#6366F1']}
-          />
-        }
-        contentContainerStyle={styles.list}
-        ListEmptyComponent={
-          <View style={styles.empty}>
-            <Ionicons name="calendar-outline" size={64} color="#CBD5E1" />
-            <Text style={styles.emptyText}>Nenhuma reserva encontrada</Text>
-          </View>
-        }
-      />
+      {loading && reservations.length === 0 ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
+      ) : (
+        <FlatList
+          data={reservations}
+          renderItem={renderItem}
+          keyExtractor={(item) => item._id}
+          refreshControl={
+            <RefreshControl
+              refreshing={loading}
+              onRefresh={loadReservations}
+              tintColor="#6366F1"
+              colors={['#6366F1']}
+            />
+          }
+          contentContainerStyle={styles.list}
+          ListEmptyComponent={
+            <View style={styles.empty}>
+              <Ionicons name="calendar-outline" size={64} color="#CBD5E1" />
+              <Text style={styles.emptyText}>Nenhuma reserva encontrada</Text>
+            </View>
+          }
+        />
+      )}
 
       {/* FAB para criar reserva (morador e síndico) */}
       {(user?.role === 'morador' || user?.role === 'sindico') && (
@@ -644,6 +650,12 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 13,
     color: '#EF4444',
+  },
+  loadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 80,
   },
   empty: {
     padding: 60,

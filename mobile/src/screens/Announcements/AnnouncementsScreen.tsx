@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, RefreshControl, Image, Platform } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, RefreshControl, Image, Platform, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
@@ -19,7 +19,7 @@ const AnnouncementsScreen = () => {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const loadAnnouncements = async () => {
     setLoading(true);
@@ -109,26 +109,32 @@ const AnnouncementsScreen = () => {
         </View>
       </LinearGradient>
 
-      <FlatList
-        data={announcements}
-        renderItem={renderItem}
-        keyExtractor={(item) => item._id}
-        refreshControl={
-          <RefreshControl 
-            refreshing={loading} 
-            onRefresh={loadAnnouncements}
-            tintColor={colors.primary}
-            colors={[colors.primary]}
-          />
-        }
-        contentContainerStyle={styles.list}
-        ListEmptyComponent={
-          <View style={styles.empty}>
-            <Ionicons name="megaphone-outline" size={64} color={colors.textTertiary} />
-            <Text style={[styles.emptyText, { color: colors.textSecondary }]}>Nenhum comunicado encontrado</Text>
-          </View>
-        }
-      />
+      {loading && announcements.length === 0 ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
+      ) : (
+        <FlatList
+          data={announcements}
+          renderItem={renderItem}
+          keyExtractor={(item) => item._id}
+          refreshControl={
+            <RefreshControl 
+              refreshing={loading} 
+              onRefresh={loadAnnouncements}
+              tintColor={colors.primary}
+              colors={[colors.primary]}
+            />
+          }
+          contentContainerStyle={styles.list}
+          ListEmptyComponent={
+            <View style={styles.empty}>
+              <Ionicons name="megaphone-outline" size={64} color={colors.textTertiary} />
+              <Text style={[styles.emptyText, { color: colors.textSecondary }]}>Nenhum comunicado encontrado</Text>
+            </View>
+          }
+        />
+      )}
 
       {/* FAB - Botão de adicionar comunicado */}
       {(user?.role === 'zelador' || user?.role === 'sindico') && (
@@ -308,6 +314,12 @@ const styles = StyleSheet.create({
   },
   chevron: {
     marginLeft: 8,
+  },
+  loadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 80,
   },
   empty: {
     padding: 60,

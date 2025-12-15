@@ -7,6 +7,7 @@ import {
   StyleSheet,
   RefreshControl,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../../contexts/AuthContext';
@@ -26,7 +27,7 @@ const ReportsScreen = () => {
   const { user } = useAuth();
   const { colors } = useTheme();
   const [reports, setReports] = useState<Report[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'aberta' | 'andamento' | 'concluida'>('all');
 
   const loadReports = useCallback(async () => {
@@ -159,29 +160,35 @@ const ReportsScreen = () => {
         ))}
       </View>
 
-      <FlatList
-        data={reports}
-        renderItem={renderItem}
-        keyExtractor={(item) => item._id}
-        refreshControl={
-          <RefreshControl 
-            refreshing={loading} 
-            onRefresh={loadReports}
-            tintColor={colors.primary}
-            colors={[colors.primary]}
-          />
-        }
-        contentContainerStyle={styles.list}
-        ListEmptyComponent={
-          <View style={styles.empty}>
-            <Ionicons name="checkmark-circle-outline" size={64} color={colors.textTertiary} />
-            <Text style={[styles.emptyText, { color: colors.textSecondary }]}>Nenhuma irregularidade</Text>
-            <Text style={[styles.emptySubtext, { color: colors.textTertiary }]}>
-              {filter !== 'all' ? 'Tente mudar o filtro' : 'Tudo em ordem por aqui!'}
-            </Text>
-          </View>
-        }
-      />
+      {loading && reports.length === 0 ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
+      ) : (
+        <FlatList
+          data={reports}
+          renderItem={renderItem}
+          keyExtractor={(item) => item._id}
+          refreshControl={
+            <RefreshControl 
+              refreshing={loading} 
+              onRefresh={loadReports}
+              tintColor={colors.primary}
+              colors={[colors.primary]}
+            />
+          }
+          contentContainerStyle={styles.list}
+          ListEmptyComponent={
+            <View style={styles.empty}>
+              <Ionicons name="checkmark-circle-outline" size={64} color={colors.textTertiary} />
+              <Text style={[styles.emptyText, { color: colors.textSecondary }]}>Nenhuma irregularidade</Text>
+              <Text style={[styles.emptySubtext, { color: colors.textTertiary }]}>
+                {filter !== 'all' ? 'Tente mudar o filtro' : 'Tudo em ordem por aqui!'}
+              </Text>
+            </View>
+          }
+        />
+      )}
 
       {/* FAB para criar */}
       {user?.role === 'morador' && (
@@ -342,6 +349,12 @@ const styles = StyleSheet.create({
   statusText: {
     fontSize: 12,
     fontWeight: '600',
+  },
+  loadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 80,
   },
   empty: {
     padding: 60,

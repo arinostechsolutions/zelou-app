@@ -60,10 +60,8 @@ const ActionCard: React.FC<ActionCardProps> = ({ icon, label, color, delay, onPr
     }
   };
 
-  // Animação de entrada: suave no iOS, spring no Android
-  const enteringAnimation = Platform.OS === 'ios' 
-    ? FadeInDown.delay(delay).duration(300)
-    : FadeInDown.delay(delay).springify().damping(15);
+  // Animação de entrada suave sem bounce
+  const enteringAnimation = FadeInDown.delay(delay).duration(200);
 
   return (
     <AnimatedTouchableOpacity
@@ -111,7 +109,7 @@ const HomeScreen = () => {
 
   useEffect(() => {
     headerOpacity.value = withTiming(1, { duration: 600 });
-    headerTranslateY.value = withSpring(0, { damping: 15, stiffness: 100 });
+    headerTranslateY.value = withTiming(0, { duration: 300 });
   }, []);
 
   const headerAnimatedStyle = useAnimatedStyle(() => {
@@ -173,7 +171,7 @@ const HomeScreen = () => {
       icon: 'stats-chart' as keyof typeof Ionicons.glyphMap,
       label: 'Relatórios',
       color: '#8B5CF6',
-      onPress: () => {},
+      onPress: () => navigateToScreen('Statistics'),
       show: true,
     },
     {
@@ -274,61 +272,63 @@ const HomeScreen = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
+      {/* Header Fixo */}
+      <Animated.View style={[styles.header, headerAnimatedStyle]}>
+        <LinearGradient
+          colors={[colors.headerGradientStart, colors.headerGradientMiddle, colors.headerGradientEnd]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={[styles.gradient, { paddingTop: insets.top + 16 }]}
+        >
+          <View style={styles.headerRow}>
+            <View style={styles.headerContent}>
+              <Text style={styles.greeting}>
+                Olá, <Text style={styles.nameBold}>{user?.name?.split(' ')[0] || 'Usuário'}</Text>
+              </Text>
+              <View style={styles.infoRow}>
+                <View style={styles.infoItem}>
+                  <Ionicons name="briefcase-outline" size={16} color="#E0E7FF" />
+                  <Text style={styles.infoText}>{getRoleLabel(user?.role)}</Text>
+                </View>
+                {user?.unit && (
+                  <>
+                    <View style={styles.infoDivider} />
+                    <View style={styles.infoItem}>
+                      <Ionicons name="home-outline" size={16} color="#E0E7FF" />
+                      <Text style={styles.infoText}>
+                        {user.unit.block ? `${user.unit.block} - ` : ''}{user.unit.number}
+                      </Text>
+                    </View>
+                  </>
+                )}
+              </View>
+            </View>
+            
+            {/* Sino de Notificações */}
+            <TouchableOpacity
+              style={styles.notificationButton}
+              onPress={() => navigation.navigate('Notifications' as never)}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="notifications-outline" size={26} color="#FFFFFF" />
+              {unreadCount > 0 && (
+                <View style={styles.notificationBadge}>
+                  <Text style={styles.notificationBadgeText}>
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </Text>
+                </View>
+              )}
+            </TouchableOpacity>
+          </View>
+        </LinearGradient>
+      </Animated.View>
+
+      {/* Área Scrollável dos Ícones */}
       <ScrollView 
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        <Animated.View style={[styles.header, headerAnimatedStyle]}>
-          <LinearGradient
-            colors={[colors.headerGradientStart, colors.headerGradientMiddle, colors.headerGradientEnd]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={[styles.gradient, { paddingTop: insets.top + 16 }]}
-          >
-            <View style={styles.headerRow}>
-              <View style={styles.headerContent}>
-                <Text style={styles.greeting}>
-                  Olá, <Text style={styles.nameBold}>{user?.name?.split(' ')[0] || 'Usuário'}</Text>
-                </Text>
-                <View style={styles.infoRow}>
-                  <View style={styles.infoItem}>
-                    <Ionicons name="briefcase-outline" size={16} color="#E0E7FF" />
-                    <Text style={styles.infoText}>{getRoleLabel(user?.role)}</Text>
-                  </View>
-                  {user?.unit && (
-                    <>
-                      <View style={styles.infoDivider} />
-                      <View style={styles.infoItem}>
-                        <Ionicons name="home-outline" size={16} color="#E0E7FF" />
-                        <Text style={styles.infoText}>
-                          {user.unit.block ? `${user.unit.block} - ` : ''}{user.unit.number}
-                        </Text>
-                      </View>
-                    </>
-                  )}
-                </View>
-              </View>
-              
-              {/* Sino de Notificações */}
-              <TouchableOpacity
-                style={styles.notificationButton}
-                onPress={() => navigation.navigate('Notifications' as never)}
-                activeOpacity={0.7}
-              >
-                <Ionicons name="notifications-outline" size={26} color="#FFFFFF" />
-                {unreadCount > 0 && (
-                  <View style={styles.notificationBadge}>
-                    <Text style={styles.notificationBadgeText}>
-                      {unreadCount > 99 ? '99+' : unreadCount}
-                    </Text>
-                  </View>
-                )}
-              </TouchableOpacity>
-            </View>
-          </LinearGradient>
-        </Animated.View>
-
         <View style={styles.quickActions}>
           {actions.map((action, index) => (
             <ActionCard
@@ -351,14 +351,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  header: {
+    overflow: 'hidden',
+    zIndex: 10,
+  },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
     paddingBottom: 20,
-  },
-  header: {
-    overflow: 'hidden',
   },
   gradient: {
     paddingBottom: 32,

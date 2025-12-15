@@ -13,6 +13,7 @@ import {
   ActivityIndicator,
   Modal,
   KeyboardAvoidingView,
+  Switch,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useNavigation } from '@react-navigation/native';
@@ -69,6 +70,8 @@ const CreateReportScreen = () => {
   const [loading, setLoading] = useState(false);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [showLocationModal, setShowLocationModal] = useState(false);
+  const [successModalVisible, setSuccessModalVisible] = useState(false);
+  const [isAnonymous, setIsAnonymous] = useState(false);
 
   const selectedCategory = CATEGORIES.find(c => c.value === category);
   const selectedLocation = LOCATIONS.find(l => l.value === location);
@@ -138,11 +141,10 @@ const CreateReportScreen = () => {
         category,
         description,
         location,
+        isAnonymous,
       });
       
-      Alert.alert('Sucesso', 'Irregularidade registrada com sucesso', [
-        { text: 'OK', onPress: () => navigation.goBack() }
-      ]);
+      setSuccessModalVisible(true);
     } catch (error: any) {
       console.error('Erro ao criar irregularidade:', error);
       Alert.alert('Erro', error.response?.data?.message || error.message || 'Erro ao registrar irregularidade');
@@ -270,6 +272,50 @@ const CreateReportScreen = () => {
             )}
             <Ionicons name="chevron-down" size={20} color="#94A3B8" />
           </TouchableOpacity>
+        </View>
+
+        {/* Enviar como Anônimo */}
+        <View style={styles.section}>
+          <View style={[
+            styles.anonymousContainer,
+            isAnonymous && styles.anonymousContainerActive
+          ]}>
+            <View style={styles.anonymousInfo}>
+              <View style={[
+                styles.anonymousIconContainer,
+                isAnonymous && styles.anonymousIconContainerActive
+              ]}>
+                <Ionicons 
+                  name={isAnonymous ? "shield-checkmark" : "shield-outline"} 
+                  size={24} 
+                  color={isAnonymous ? "#FFFFFF" : "#6366F1"} 
+                />
+              </View>
+              <View style={styles.anonymousTextContainer}>
+                <Text style={[
+                  styles.anonymousTitle,
+                  isAnonymous && styles.anonymousTitleActive
+                ]}>
+                  Enviar como anônimo
+                </Text>
+                <Text style={[
+                  styles.anonymousDescription,
+                  isAnonymous && styles.anonymousDescriptionActive
+                ]}>
+                  {isAnonymous 
+                    ? 'Seu nome e dados não serão exibidos publicamente' 
+                    : 'Seu nome e dados não serão exibidos'}
+                </Text>
+              </View>
+            </View>
+            <Switch
+              value={isAnonymous}
+              onValueChange={setIsAnonymous}
+              trackColor={{ false: '#E2E8F0', true: '#6366F1' }}
+              thumbColor="#FFFFFF"
+              ios_backgroundColor="#E2E8F0"
+            />
+          </View>
         </View>
 
         {/* Descrição */}
@@ -421,6 +467,42 @@ const CreateReportScreen = () => {
             </ScrollView>
           </View>
         </TouchableOpacity>
+      </Modal>
+
+      {/* Modal de Sucesso */}
+      <Modal
+        visible={successModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => {
+          setSuccessModalVisible(false);
+          navigation.goBack();
+        }}
+      >
+        <View style={styles.successModalOverlay}>
+          <View style={styles.successModalContent}>
+            <Ionicons name="checkmark-circle" size={60} color="#10B981" />
+            <Text style={styles.successModalTitle}>Sucesso!</Text>
+            <Text style={styles.successModalMessage}>Irregularidade registrada com sucesso!</Text>
+            <TouchableOpacity
+              style={styles.successModalButton}
+              onPress={() => {
+                setSuccessModalVisible(false);
+                navigation.goBack();
+              }}
+              activeOpacity={0.8}
+            >
+              <LinearGradient
+                colors={['#6366F1', '#8B5CF6']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.successModalButtonGradient}
+              >
+                <Text style={styles.successModalButtonText}>OK</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
+        </View>
       </Modal>
     </View>
   );
@@ -671,6 +753,139 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '700',
+  },
+  successModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  successModalContent: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 24,
+    padding: 32,
+    alignItems: 'center',
+    width: '100%',
+    maxWidth: 400,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.15,
+        shadowRadius: 12,
+      },
+      android: {
+        elevation: 8,
+      },
+    }),
+  },
+  successModalTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#1E293B',
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  successModalMessage: {
+    fontSize: 16,
+    color: '#475569',
+    textAlign: 'center',
+    marginBottom: 30,
+  },
+  successModalButton: {
+    width: '100%',
+    borderRadius: 16,
+    overflow: 'hidden',
+    marginTop: 10,
+  },
+  successModalButtonGradient: {
+    paddingVertical: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  successModalButtonText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+  anonymousContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 18,
+    backgroundColor: '#F8FAFC',
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: '#E2E8F0',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 2,
+      },
+    }),
+  },
+  anonymousContainerActive: {
+    backgroundColor: '#EEF2FF',
+    borderColor: '#6366F1',
+    borderWidth: 3,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#6366F1',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.15,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
+  },
+  anonymousInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    marginRight: 16,
+  },
+  anonymousIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#EEF2FF',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  anonymousIconContainerActive: {
+    backgroundColor: '#6366F1',
+  },
+  anonymousTextContainer: {
+    marginLeft: 14,
+    flex: 1,
+  },
+  anonymousTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#1E293B',
+    marginBottom: 6,
+    letterSpacing: 0.2,
+  },
+  anonymousTitleActive: {
+    color: '#6366F1',
+  },
+  anonymousDescription: {
+    fontSize: 13,
+    color: '#64748B',
+    lineHeight: 18,
+    fontWeight: '500',
+  },
+  anonymousDescriptionActive: {
+    color: '#475569',
+    fontWeight: '600',
   },
 });
 

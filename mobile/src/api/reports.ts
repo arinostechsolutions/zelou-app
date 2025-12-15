@@ -10,6 +10,7 @@ export interface Report {
       number: string;
     };
   };
+  isAnonymous?: boolean;
   photos: string[];
   category: string;
   description: string;
@@ -34,6 +35,7 @@ export interface CreateReportRequest {
   category: string;
   description: string;
   location: string;
+  isAnonymous?: boolean;
 }
 
 export const reportsApi = {

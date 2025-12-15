@@ -8,20 +8,27 @@ import {
   Alert,
   ActivityIndicator,
   Platform,
+  Modal,
 } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { reservationsApi, Reservation } from '../../api/reservations';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import GradientHeader from '../../components/GradientHeader';
 import { formatDateLong, formatDateTime } from '../../utils/dateFormat';
+import { useAuth } from '../../contexts/AuthContext';
 
 const ReservationDetailScreen = () => {
   const route = useRoute();
   const navigation = useNavigation();
+  const { user } = useAuth();
   const { reservationId } = route.params as { reservationId: string };
   const [reservation, setReservation] = useState<Reservation | null>(null);
   const [loading, setLoading] = useState(true);
   const [cancelling, setCancelling] = useState(false);
+  const [approving, setApproving] = useState(false);
+  const [approveModalVisible, setApproveModalVisible] = useState(false);
+  const [successModalVisible, setSuccessModalVisible] = useState(false);
 
   useEffect(() => {
     loadReservation();
@@ -37,6 +44,30 @@ const ReservationDetailScreen = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleApprove = () => {
+    if (!reservation) return;
+    setApproveModalVisible(true);
+  };
+
+  const confirmApprove = async () => {
+    if (!reservation) return;
+    setApproveModalVisible(false);
+    setApproving(true);
+    try {
+      await reservationsApi.approve(reservation._id);
+      setSuccessModalVisible(true);
+      loadReservation();
+    } catch (error: any) {
+      Alert.alert('Erro', error.response?.data?.message || 'Erro ao aprovar reserva');
+    } finally {
+      setApproving(false);
+    }
+  };
+
+  const handleSuccessModalClose = () => {
+    setSuccessModalVisible(false);
   };
 
   const handleCancel = async () => {
@@ -115,6 +146,11 @@ const ReservationDetailScreen = () => {
   };
 
   const canCancel = reservation?.status === 'pendente' || reservation?.status === 'aprovada';
+  
+  // Verificar se o usuário pode aprovar (gestores e reserva pendente)
+  const canApprove = user && 
+    ['porteiro', 'zelador', 'sindico'].includes(user.role) && 
+    reservation?.status === 'pendente';
 
   if (loading) {
     return (
@@ -287,6 +323,32 @@ const ReservationDetailScreen = () => {
           </View>
         )}
 
+        {/* Botão Aprovar (apenas para gestores) */}
+        {canApprove && (
+          <TouchableOpacity
+            style={[styles.approveButton, approving && styles.approveButtonDisabled]}
+            onPress={handleApprove}
+            disabled={approving}
+            activeOpacity={0.8}
+          >
+            <LinearGradient
+              colors={['#10B981', '#059669']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.approveButtonGradient}
+            >
+              {approving ? (
+                <ActivityIndicator color="#FFFFFF" />
+              ) : (
+                <>
+                  <Ionicons name="checkmark-circle-outline" size={24} color="#FFFFFF" />
+                  <Text style={styles.approveButtonText}>Aprovar Reserva</Text>
+                </>
+              )}
+            </LinearGradient>
+          </TouchableOpacity>
+        )}
+
         {/* Botão Cancelar */}
         {canCancel && (
           <TouchableOpacity
@@ -306,6 +368,79 @@ const ReservationDetailScreen = () => {
           </TouchableOpacity>
         )}
       </ScrollView>
+
+      {/* Modal de Confirmação de Aprovação */}
+      <Modal
+        visible={approveModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setApproveModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalIconContainer}>
+              <Ionicons name="checkmark-circle-outline" size={48} color="#10B981" />
+            </View>
+            <Text style={styles.modalTitle}>Aprovar Reserva</Text>
+            <Text style={styles.modalMessage}>
+              Deseja realmente aprovar esta reserva?
+            </Text>
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.modalButtonCancel]}
+                onPress={() => setApproveModalVisible(false)}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.modalButtonCancelText}>Cancelar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.modalButtonConfirm]}
+                onPress={confirmApprove}
+                activeOpacity={0.8}
+              >
+                <LinearGradient
+                  colors={['#10B981', '#059669']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.modalButtonGradient}
+                >
+                  <Text style={styles.modalButtonConfirmText}>Aprovar</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Modal de Sucesso */}
+      <Modal
+        visible={successModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={handleSuccessModalClose}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Ionicons name="checkmark-circle" size={60} color="#10B981" />
+            <Text style={styles.successModalTitle}>Sucesso!</Text>
+            <Text style={styles.successModalMessage}>Reserva aprovada com sucesso!</Text>
+            <TouchableOpacity
+              style={styles.successModalButton}
+              onPress={handleSuccessModalClose}
+              activeOpacity={0.8}
+            >
+              <LinearGradient
+                colors={['#6366F1', '#8B5CF6']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.successModalButtonGradient}
+              >
+                <Text style={styles.successModalButtonText}>OK</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -454,6 +589,38 @@ const styles = StyleSheet.create({
     color: '#991B1B',
     lineHeight: 20,
   },
+  approveButton: {
+    borderRadius: 12,
+    overflow: 'hidden',
+    marginTop: 8,
+    marginBottom: 12,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#10B981',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
+  },
+  approveButtonGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+    gap: 8,
+  },
+  approveButtonDisabled: {
+    opacity: 0.6,
+  },
+  approveButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '700',
+  },
   cancelButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -482,6 +649,122 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '700',
+  },
+  // Modal Styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 24,
+    padding: 32,
+    alignItems: 'center',
+    width: '100%',
+    maxWidth: 400,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.15,
+        shadowRadius: 12,
+      },
+      android: {
+        elevation: 8,
+      },
+    }),
+  },
+  modalIconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#D1FAE5',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#1E293B',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  modalMessage: {
+    fontSize: 16,
+    color: '#475569',
+    textAlign: 'center',
+    marginBottom: 30,
+    lineHeight: 24,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    width: '100%',
+    gap: 12,
+  },
+  modalButton: {
+    flex: 1,
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  modalButtonCancel: {
+    backgroundColor: '#F1F5F9',
+    borderWidth: 2,
+    borderColor: '#E2E8F0',
+  },
+  modalButtonConfirm: {
+    // Gradient será aplicado no LinearGradient
+  },
+  modalButtonGradient: {
+    paddingVertical: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalButtonCancelText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#64748B',
+    textAlign: 'center',
+    paddingVertical: 16,
+  },
+  modalButtonConfirmText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+  // Success Modal Styles
+  successModalTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#1E293B',
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  successModalMessage: {
+    fontSize: 16,
+    color: '#475569',
+    textAlign: 'center',
+    marginBottom: 30,
+    lineHeight: 24,
+  },
+  successModalButton: {
+    width: '100%',
+    borderRadius: 16,
+    overflow: 'hidden',
+    marginTop: 10,
+  },
+  successModalButtonGradient: {
+    paddingVertical: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  successModalButtonText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#FFFFFF',
   },
 });
 

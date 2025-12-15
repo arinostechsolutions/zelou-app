@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert, Platform, Switch } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert, Platform, Switch, Modal } from 'react-native';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useNavigation } from '@react-navigation/native';
@@ -17,18 +17,15 @@ const ProfileScreen = () => {
   const { colors } = useTheme();
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
+  const [logoutModalVisible, setLogoutModalVisible] = useState(false);
 
   const handleLogout = async () => {
-    Alert.alert('Sair', 'Deseja realmente sair?', [
-      { text: 'Cancelar', style: 'cancel' },
-      {
-        text: 'Sair',
-        style: 'destructive',
-        onPress: async () => {
-          await logout();
-        },
-      },
-    ]);
+    setLogoutModalVisible(true);
+  };
+
+  const confirmLogout = async () => {
+    setLogoutModalVisible(false);
+    await logout();
   };
 
   const getRoleLabel = (role?: string) => {
@@ -48,12 +45,20 @@ const ProfileScreen = () => {
 
   const menuItems = [
     // Opção de admin (apenas para master admin)
-    ...(user?.role === 'master' || user?.isMasterAdmin ? [{
-      icon: 'shield-checkmark' as keyof typeof Ionicons.glyphMap,
-      label: 'Administração',
-      color: '#DC2626',
-      onPress: () => navigation.navigate('Condominiums' as never),
-    }] : []),
+    ...(user?.role === 'master' || user?.isMasterAdmin ? [
+      {
+        icon: 'shield-checkmark' as keyof typeof Ionicons.glyphMap,
+        label: 'Administração',
+        color: '#DC2626',
+        onPress: () => navigation.navigate('Condominiums' as never),
+      },
+      {
+        icon: 'stats-chart' as keyof typeof Ionicons.glyphMap,
+        label: 'Estatísticas',
+        color: '#10B981',
+        onPress: () => navigation.navigate('Statistics' as never),
+      },
+    ] : []),
     {
       icon: 'person-outline' as keyof typeof Ionicons.glyphMap,
       label: 'Editar Dados Pessoais',
@@ -195,6 +200,49 @@ const ProfileScreen = () => {
           </AnimatedTouchableOpacity>
         </View>
       </ScrollView>
+
+      {/* Modal de Confirmação de Logout */}
+      <Modal
+        visible={logoutModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setLogoutModalVisible(false)}
+      >
+        <View style={styles.logoutModalOverlay}>
+          <View style={styles.logoutModalContent}>
+            <View style={styles.logoutModalIconContainer}>
+              <Ionicons name="log-out-outline" size={48} color="#EF4444" />
+            </View>
+            <Text style={styles.logoutModalTitle}>Sair da conta</Text>
+            <Text style={styles.logoutModalMessage}>Deseja realmente sair da sua conta?</Text>
+            
+            <View style={styles.logoutModalButtons}>
+              <TouchableOpacity
+                style={[styles.logoutModalButton, styles.logoutModalButtonCancel]}
+                onPress={() => setLogoutModalVisible(false)}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.logoutModalButtonCancelText}>Cancelar</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity
+                style={[styles.logoutModalButton, styles.logoutModalButtonConfirm]}
+                onPress={confirmLogout}
+                activeOpacity={0.8}
+              >
+                <LinearGradient
+                  colors={['#EF4444', '#DC2626']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.logoutModalButtonGradient}
+                >
+                  <Text style={styles.logoutModalButtonConfirmText}>Sair</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -341,6 +389,93 @@ const styles = StyleSheet.create({
   themeOptionText: {
     fontSize: 13,
     fontWeight: '600',
+  },
+  logoutModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+    paddingBottom: 40,
+  },
+  logoutModalContent: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 24,
+    padding: 32,
+    paddingBottom: 32,
+    alignItems: 'center',
+    width: '100%',
+    maxWidth: 400,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.15,
+        shadowRadius: 12,
+      },
+      android: {
+        elevation: 8,
+      },
+    }),
+  },
+  logoutModalIconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#FEE2E2',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+  },
+  logoutModalTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#1E293B',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  logoutModalMessage: {
+    fontSize: 16,
+    color: '#475569',
+    textAlign: 'center',
+    marginBottom: 24,
+    lineHeight: 24,
+  },
+  logoutModalButtons: {
+    flexDirection: 'row',
+    width: '100%',
+    gap: 12,
+    marginTop: 8,
+  },
+  logoutModalButton: {
+    flex: 1,
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  logoutModalButtonCancel: {
+    backgroundColor: '#F1F5F9',
+    borderWidth: 2,
+    borderColor: '#E2E8F0',
+  },
+  logoutModalButtonConfirm: {
+    // Gradient será aplicado no LinearGradient
+  },
+  logoutModalButtonGradient: {
+    paddingVertical: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logoutModalButtonCancelText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#64748B',
+    textAlign: 'center',
+    paddingVertical: 16,
+  },
+  logoutModalButtonConfirmText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#FFFFFF',
   },
 });
 

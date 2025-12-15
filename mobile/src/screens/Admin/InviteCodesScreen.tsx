@@ -52,6 +52,7 @@ const InviteCodesScreen = () => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const [successModalVisible, setSuccessModalVisible] = useState(false);
   const [creating, setCreating] = useState(false);
 
   // Form state
@@ -98,13 +99,13 @@ const InviteCodesScreen = () => {
       if (unit) data.unit = unit;
 
       await condominiumsApi.generateInviteCode(condominiumId, data);
-      Alert.alert('Sucesso', 'Código de convite criado com sucesso!');
       setModalVisible(false);
       setRole('morador');
       setBlock('');
       setUnit('');
       setMaxUses('1');
       loadInviteCodes();
+      setSuccessModalVisible(true);
     } catch (error: any) {
       console.error('Erro ao criar código:', error);
       Alert.alert('Erro', error.response?.data?.message || 'Não foi possível criar o código.');
@@ -369,6 +370,36 @@ const InviteCodesScreen = () => {
           </View>
         </View>
       </Modal>
+
+      {/* Modal de Sucesso */}
+      <Modal
+        visible={successModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setSuccessModalVisible(false)}
+      >
+        <View style={styles.successModalOverlay}>
+          <View style={styles.successModalContent}>
+            <Ionicons name="checkmark-circle" size={60} color="#10B981" />
+            <Text style={styles.successModalTitle}>Sucesso!</Text>
+            <Text style={styles.successModalMessage}>Código de convite criado com sucesso!</Text>
+            <TouchableOpacity
+              style={styles.successModalButton}
+              onPress={() => setSuccessModalVisible(false)}
+              activeOpacity={0.8}
+            >
+              <LinearGradient
+                colors={['#6366F1', '#8B5CF6']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.successModalButtonGradient}
+              >
+                <Text style={styles.successModalButtonText}>OK</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -613,6 +644,61 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   createButtonText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+  successModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  successModalContent: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 24,
+    padding: 32,
+    alignItems: 'center',
+    width: '100%',
+    maxWidth: 400,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.15,
+        shadowRadius: 12,
+      },
+      android: {
+        elevation: 8,
+      },
+    }),
+  },
+  successModalTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#1E293B',
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  successModalMessage: {
+    fontSize: 16,
+    color: '#475569',
+    textAlign: 'center',
+    marginBottom: 30,
+  },
+  successModalButton: {
+    width: '100%',
+    borderRadius: 16,
+    overflow: 'hidden',
+    marginTop: 10,
+  },
+  successModalButtonGradient: {
+    paddingVertical: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  successModalButtonText: {
     fontSize: 16,
     fontWeight: '700',
     color: '#FFFFFF',

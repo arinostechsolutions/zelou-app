@@ -9,6 +9,7 @@ import {
   Alert,
   Platform,
   Linking,
+  ActivityIndicator,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useAuth } from '../../contexts/AuthContext';
@@ -37,13 +38,19 @@ const DocumentsScreen = () => {
   const isRules = documentType === 'rule';
   const isSindico = user?.role === 'sindico';
 
-  const loadDocuments = useCallback(async () => {
+  const loadDocuments = useCallback(async (skipLoading = false) => {
+    if (!skipLoading) {
+      setLoading(true);
+    }
     try {
       const response = await documentsApi.getAll({ type: documentType });
-      setDocuments(response.data);
-    } catch (error) {
+      setDocuments(Array.isArray(response.data) ? response.data : []);
+    } catch (error: any) {
       console.error('Erro ao carregar documentos:', error);
-      Alert.alert('Erro', 'Não foi possível carregar os documentos');
+      setDocuments([]);
+      if (error.response?.status !== 401 && !skipLoading) {
+        Alert.alert('Erro', 'Não foi possível carregar os documentos');
+      }
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -51,14 +58,19 @@ const DocumentsScreen = () => {
   }, [documentType]);
 
   useEffect(() => {
-    loadDocuments();
-    const unsubscribe = navigation.addListener('focus', loadDocuments);
+    loadDocuments(false);
+  }, [documentType]);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      loadDocuments(true);
+    });
     return unsubscribe;
-  }, [loadDocuments, navigation]);
+  }, [navigation, loadDocuments]);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    loadDocuments();
+    loadDocuments(true);
   }, [loadDocuments]);
 
   const handleOpenDocument = async (doc: Document) => {
@@ -160,6 +172,21 @@ const DocumentsScreen = () => {
       </View>
     </AnimatedTouchableOpacity>
   );
+
+  if (loading && documents.length === 0) {
+    return (
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <GradientHeader
+          title={isRules ? 'Regras' : 'Documentos'}
+          subtitle="Carregando..."
+          onBackPress={() => navigation.goBack()}
+        />
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -310,6 +337,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#FEE2E2',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   empty: {
     padding: 60,

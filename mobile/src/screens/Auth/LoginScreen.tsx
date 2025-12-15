@@ -35,6 +35,33 @@ const LoginScreen = () => {
   
   const passwordRef = useRef<TextInput>(null);
 
+  const formatCPF = (value: string) => {
+    const numbers = value.replace(/\D/g, '');
+    if (numbers.length <= 3) return numbers;
+    if (numbers.length <= 6) return `${numbers.slice(0, 3)}.${numbers.slice(3)}`;
+    if (numbers.length <= 9) return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(6)}`;
+    return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(6, 9)}-${numbers.slice(9, 11)}`;
+  };
+
+  const handleEmailOrCpfChange = (text: string) => {
+    // Remove todos os caracteres não numéricos para verificar se é CPF
+    const numbersOnly = text.replace(/\D/g, '');
+    
+    // Se contém @ ou letras, é email - não aplica máscara
+    if (text.includes('@') || /[a-zA-Z]/.test(text)) {
+      setEmail(text);
+      return;
+    }
+    
+    // Se contém apenas números e tem até 11 dígitos, aplica máscara de CPF
+    if (numbersOnly.length > 0 && numbersOnly.length <= 11) {
+      setEmail(formatCPF(text));
+    } else {
+      // Caso contrário, mantém o texto como está
+      setEmail(text);
+    }
+  };
+
   const handleLogin = async () => {
     if (!email.trim()) {
       Alert.alert('Atenção', 'Digite seu email ou CPF');
@@ -47,7 +74,11 @@ const LoginScreen = () => {
 
     setLoading(true);
     try {
-      await login(email.trim(), password);
+      // Remove a máscara do CPF antes de enviar (mantém apenas números)
+      const loginValue = email.replace(/\D/g, '').length === 11 
+        ? email.replace(/\D/g, '') 
+        : email.trim();
+      await login(loginValue, password);
     } catch (error: any) {
       Alert.alert('Erro', error.response?.data?.message || 'Erro ao fazer login');
     } finally {
@@ -116,11 +147,12 @@ const LoginScreen = () => {
                   placeholder="Digite seu email ou CPF"
                   placeholderTextColor="#94A3B8"
                   value={email}
-                  onChangeText={setEmail}
+                  onChangeText={handleEmailOrCpfChange}
                   autoCapitalize="none"
-                  keyboardType="email-address"
+                  keyboardType={email.includes('@') || /[a-zA-Z]/.test(email) ? "email-address" : "numeric"}
                   returnKeyType="next"
                   onSubmitEditing={() => passwordRef.current?.focus()}
+                  maxLength={email.includes('@') || /[a-zA-Z]/.test(email) ? undefined : 14}
                 />
               </View>
             </View>
@@ -249,6 +281,8 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     marginBottom: 16,
+    borderRadius: 20,
+    overflow: 'hidden',
   },
   headerTitle: {
     fontSize: 28,

@@ -8,6 +8,7 @@ import {
   RefreshControl,
   Alert,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../../contexts/AuthContext';
@@ -26,7 +27,7 @@ const VisitorsScreen = () => {
   const { user } = useAuth();
   const { colors } = useTheme();
   const [visitors, setVisitors] = useState<Visitor[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const loadVisitors = useCallback(async () => {
     setLoading(true);
@@ -207,29 +208,35 @@ const VisitorsScreen = () => {
         onBackPress={() => navigation.goBack()}
       />
 
-      <FlatList
-        data={visitors}
-        renderItem={renderItem}
-        keyExtractor={(item) => item._id}
-        refreshControl={
-          <RefreshControl
-            refreshing={loading}
-            onRefresh={loadVisitors}
-            tintColor={colors.primary}
-            colors={[colors.primary]}
-          />
-        }
-        contentContainerStyle={styles.list}
-        ListEmptyComponent={
-          <View style={styles.empty}>
-            <Ionicons name="people-outline" size={64} color={colors.textTertiary} />
-            <Text style={[styles.emptyText, { color: colors.textSecondary }]}>Nenhum visitante hoje</Text>
-            <Text style={[styles.emptySubtext, { color: colors.textTertiary }]}>
-              Os visitantes agendados aparecerão aqui
-            </Text>
-          </View>
-        }
-      />
+      {loading && visitors.length === 0 ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
+      ) : (
+        <FlatList
+          data={visitors}
+          renderItem={renderItem}
+          keyExtractor={(item) => item._id}
+          refreshControl={
+            <RefreshControl
+              refreshing={loading}
+              onRefresh={loadVisitors}
+              tintColor={colors.primary}
+              colors={[colors.primary]}
+            />
+          }
+          contentContainerStyle={styles.list}
+          ListEmptyComponent={
+            <View style={styles.empty}>
+              <Ionicons name="people-outline" size={64} color={colors.textTertiary} />
+              <Text style={[styles.emptyText, { color: colors.textSecondary }]}>Nenhum visitante hoje</Text>
+              <Text style={[styles.emptySubtext, { color: colors.textTertiary }]}>
+                Os visitantes agendados aparecerão aqui
+              </Text>
+            </View>
+          }
+        />
+      )}
 
       {/* FAB para criar */}
       {user?.role === 'morador' && (
@@ -356,6 +363,12 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 14,
     fontWeight: '600',
+  },
+  loadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 80,
   },
   empty: {
     padding: 60,
