@@ -40,7 +40,10 @@ router.get('/', auth, async (req, res) => {
       .populate('createdBy', 'name')
       .sort({ createdAt: -1 });
 
-    res.json(deliveries);
+    // Filter out deliveries with null residentId (deleted users)
+    const validDeliveries = deliveries.filter(d => d.residentId !== null);
+
+    res.json(validDeliveries);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Erro ao buscar entregas', error: error.message });
@@ -104,6 +107,10 @@ router.get('/:id', auth, async (req, res) => {
     }
 
     // Check permission
+    if (!delivery.residentId) {
+      return res.status(404).json({ message: 'Usuário associado à entrega não encontrado' });
+    }
+    
     if (req.user.role === 'morador' && delivery.residentId._id.toString() !== req.user._id.toString()) {
       return res.status(403).json({ message: 'Acesso negado' });
     }
