@@ -145,7 +145,7 @@ export default function IrregularidadesPage() {
       )}
 
       <div className="reports-grid">
-        {reports.map((report) => (
+        {(reports || []).map((report) => (
           <div key={report._id} className="report-card">
             <div className="report-header">
               <div className="report-category">{report.category}</div>
@@ -203,7 +203,7 @@ export default function IrregularidadesPage() {
         ))}
       </div>
 
-      {reports.length === 0 && !loading && (
+      {(!reports || reports.length === 0) && !loading && (
         <div className="empty-state">
           <p>📋 Nenhuma irregularidade encontrada</p>
         </div>
