@@ -149,10 +149,9 @@ const LoginScreen = () => {
                   value={email}
                   onChangeText={handleEmailOrCpfChange}
                   autoCapitalize="none"
-                  keyboardType={email.includes('@') || /[a-zA-Z]/.test(email) ? "email-address" : "numeric"}
+                  keyboardType="default"
                   returnKeyType="next"
                   onSubmitEditing={() => passwordRef.current?.focus()}
-                  maxLength={email.includes('@') || /[a-zA-Z]/.test(email) ? undefined : 14}
                 />
               </View>
             </View>

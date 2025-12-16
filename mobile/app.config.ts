@@ -62,7 +62,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     ...config,
     name: 'Zelou',
     slug: 'zelou',
-    version: '1.0.2',
+    version: '1.0.4',
     orientation: 'portrait',
     icon: './assets/icon.png',
     userInterfaceStyle: 'light',
@@ -118,7 +118,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         },
       ],
     ],
-    runtimeVersion: '1.0.2',
+    runtimeVersion: '1.0.4',
   };
 };
 

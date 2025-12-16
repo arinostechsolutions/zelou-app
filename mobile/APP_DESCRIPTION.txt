@@ -1,0 +1,212 @@
+ZELOU - DESCRIÇÃO DO APLICATIVO
+
+================================================================================
+VERSÃO CURTA (Para App Stores - até 80 caracteres)
+================================================================================
+
+Zelou - Gestão completa do seu condomínio na palma da mão
+
+================================================================================
+VERSÃO MÉDIA (Para App Stores - até 4000 caracteres)
+================================================================================
+
+Zelou - Gestão Inteligente de Condomínio
+
+O Zelou é o aplicativo completo para modernizar a gestão do seu condomínio, conectando moradores, porteiros, zeladores e síndicos em uma plataforma única e intuitiva.
+
+GESTÃO COMPLETA DE ENTREGAS
+- Receba notificações quando suas encomendas chegarem
+- Acompanhe o status das entregas em tempo real
+- Confirme a retirada diretamente pelo app
+- Porteiros podem registrar e gerenciar todas as entregas facilmente
+
+RELATÓRIOS DE IRREGULARIDADES
+- Reporte problemas do condomínio com fotos e descrições detalhadas
+- Acompanhe o status e resolução das irregularidades
+- Opção de relatar de forma anônima para maior privacidade
+- Sistema de categorização para organização eficiente
+
+RESERVAS DE ÁREAS COMUNS
+- Reserve salões de festas, quadras, piscinas e outras áreas comuns
+- Visualize disponibilidade em tempo real
+- Receba confirmações instantâneas
+- Gerencie suas reservas e histórico
+
+COMUNICADOS E AVISOS
+- Receba notificações importantes do condomínio
+- Acesse comunicados, regras e documentos
+- Mantenha-se informado sobre eventos e reuniões
+- Sistema de priorização para avisos urgentes
+
+GESTÃO DE VISITANTES
+- Cadastre visitantes antecipadamente
+- Porteiros podem liberar entrada e saída rapidamente
+- Histórico completo de visitas
+- Notificações automáticas para moradores
+
+SOLICITAÇÕES DE MANUTENÇÃO
+- Solicite serviços de manutenção diretamente pelo app
+- Acompanhe o status das solicitações
+- Receba notificações quando a manutenção for concluída
+- Histórico completo de serviços realizados
+
+DOCUMENTOS E REGRAS
+- Acesse documentos importantes do condomínio
+- Consulte regras e regulamentos
+- Mantenha tudo organizado e acessível
+
+RELATÓRIOS E ESTATÍSTICAS (Para Administradores)
+- Visualize estatísticas completas do condomínio
+- Acompanhe desempenho e uso das funcionalidades
+- Relatórios de usuários por condomínio
+- Análise de atividades recentes
+
+SEGURANÇA E PRIVACIDADE
+- Sistema de autenticação seguro
+- Dados protegidos e criptografados
+- Opção de relatórios anônimos
+- Conformidade com LGPD
+
+PERFIS POR FUNÇÃO
+- Moradores: Acesse todas as funcionalidades do dia a dia
+- Porteiros: Gerencie entregas e visitantes com agilidade
+- Zeladores: Monitore irregularidades e manutenções
+- Síndicos: Controle total da gestão do condomínio
+- Administradores: Gerencie múltiplos condomínios
+
+RECURSOS ADICIONAIS
+- Interface moderna e intuitiva
+- Notificações push em tempo real
+- Sincronização automática de dados
+- Suporte offline para visualização
+- Design responsivo e acessível
+
+BENEFÍCIOS
+- Comunicação Eficiente: Todos conectados em uma única plataforma
+- Organização: Tudo organizado e fácil de encontrar
+- Transparência: Acompanhe tudo que acontece no condomínio
+- Praticidade: Resolva questões sem sair de casa
+- Economia de Tempo: Menos papelada e burocracia
+
+Transforme a gestão do seu condomínio com o Zelou. Baixe agora e experimente a praticidade de ter tudo na palma da mão!
+
+Desenvolvido para iOS e Android
+
+================================================================================
+VERSÃO LONGA (Para Website/Marketing)
+================================================================================
+
+Zelou: A Revolução na Gestão de Condomínios
+
+O Zelou é uma solução completa e inovadora para gestão de condomínios, desenvolvida para conectar moradores, porteiros, zeladores e síndicos em uma plataforma digital moderna e eficiente.
+
+POR QUE ESCOLHER O ZELOU?
+
+Em um mundo cada vez mais digital, a gestão de condomínios ainda depende de métodos tradicionais e burocráticos. O Zelou chega para transformar essa realidade, oferecendo uma experiência completa, intuitiva e segura.
+
+FUNCIONALIDADES PRINCIPAIS
+
+1. GESTÃO DE ENTREGAS
+Sistema completo para gerenciar encomendas e correspondências. Moradores recebem notificações instantâneas quando suas entregas chegam, podem acompanhar o status em tempo real e confirmar a retirada diretamente pelo aplicativo. Porteiros têm uma ferramenta poderosa para registrar, organizar e gerenciar todas as entregas do condomínio.
+
+2. RELATÓRIOS DE IRREGULARIDADES
+Plataforma eficiente para reportar e resolver problemas do condomínio. Moradores podem criar relatórios detalhados com fotos, descrições e categorização. O sistema permite acompanhar o status de cada irregularidade desde a abertura até a resolução. Para maior privacidade, oferecemos a opção de relatar de forma anônima.
+
+3. RESERVAS DE ÁREAS COMUNS
+Sistema inteligente de reservas que permite visualizar disponibilidade em tempo real, fazer reservas de forma rápida e receber confirmações instantâneas. Ideal para salões de festas, quadras esportivas, piscinas, churrasqueiras e outras áreas comuns do condomínio.
+
+4. COMUNICADOS E DOCUMENTOS
+Central de comunicação onde síndicos e administradores podem publicar avisos importantes, comunicados, regras e documentos. Moradores recebem notificações sobre novos comunicados e têm acesso fácil a todo o histórico e documentos do condomínio.
+
+5. GESTÃO DE VISITANTES
+Solução completa para cadastro e controle de visitantes. Moradores podem cadastrar visitantes antecipadamente, porteiros têm acesso rápido para liberar entrada e saída, e todo o histórico fica registrado para consulta e segurança.
+
+6. SOLICITAÇÕES DE MANUTENÇÃO
+Sistema para solicitar e acompanhar serviços de manutenção. Moradores podem criar solicitações detalhadas, acompanhar o status em tempo real e receber notificações quando os serviços forem concluídos.
+
+7. RELATÓRIOS E ESTATÍSTICAS
+Para administradores e síndicos, oferecemos dashboards completos com estatísticas do condomínio, análise de uso das funcionalidades, relatórios de usuários e atividades recentes, facilitando a tomada de decisões baseada em dados.
+
+SEGURANÇA E PRIVACIDADE
+
+O Zelou leva a segurança dos seus dados muito a sério. Implementamos:
+- Criptografia de ponta a ponta
+- Autenticação segura com tokens JWT
+- Conformidade total com a LGPD (Lei Geral de Proteção de Dados)
+- Opção de relatórios anônimos para maior privacidade
+- Armazenamento seguro em servidores protegidos
+
+PERFIS PERSONALIZADOS
+
+Cada função no condomínio tem acesso às ferramentas necessárias:
+
+- Moradores: Acesso completo às funcionalidades do dia a dia
+- Porteiros: Ferramentas para gerenciar entregas e visitantes
+- Zeladores: Painel para monitorar irregularidades e manutenções
+- Síndicos: Controle total da gestão do condomínio
+- Administradores Master: Gerenciamento de múltiplos condomínios
+
+TECNOLOGIA DE PONTA
+
+Desenvolvido com as melhores tecnologias:
+- Interface moderna e responsiva
+- Notificações push em tempo real
+- Sincronização automática
+- Suporte para iOS e Android
+- Performance otimizada
+
+BENEFÍCIOS REAIS
+
+- Comunicação Eficiente: Todos os moradores e funcionários conectados
+- Organização Total: Tudo centralizado e fácil de encontrar
+- Transparência: Acompanhe todas as atividades do condomínio
+- Praticidade: Resolva questões sem sair de casa
+- Economia: Reduza custos com papelada e processos manuais
+- Tempo: Economize horas com processos automatizados
+
+COMECE AGORA
+
+O Zelou está disponível gratuitamente para iOS e Android. Baixe agora e transforme a gestão do seu condomínio!
+
+Zelou - Seu condomínio mais organizado, seguro e inteligente.
+
+================================================================================
+VERSÕES PARA REDES SOCIAIS
+================================================================================
+
+INSTAGRAM/FACEBOOK (até 150 caracteres):
+🏠 Zelou - Gestão completa do seu condomínio na palma da mão! Entregas, reservas, comunicados e muito mais. Baixe agora! 📱
+
+TWITTER/X (até 280 caracteres):
+🏠 Conheça o Zelou - o app que revoluciona a gestão de condomínios! 
+
+✅ Entregas
+✅ Reservas de áreas
+✅ Relatórios de irregularidades
+✅ Comunicados
+✅ Gestão de visitantes
+
+Tudo em um só lugar! 📱✨
+
+LINKEDIN (até 300 caracteres):
+Zelou - Solução completa para gestão de condomínios. Conecte moradores, porteiros, zeladores e síndicos em uma plataforma digital moderna, segura e eficiente. Transforme a administração do seu condomínio hoje mesmo!
+
+================================================================================
+PALAVRAS-CHAVE E TAGS
+================================================================================
+
+Palavras-chave principais:
+- Gestão de condomínio
+- Aplicativo de condomínio
+- App condomínio
+- Zelou
+- Administração condominial
+- Gestão residencial
+- App para síndico
+- Gestão de entregas
+- Reserva de áreas comuns
+- Relatórios de irregularidades
+
+Tags sugeridas:
+#Zelou #GestãoDeCondomínio #AppCondomínio #AdministraçãoCondominial #Tecnologia #Inovação #LGPD #Segurança #Praticidade #Organização
+
