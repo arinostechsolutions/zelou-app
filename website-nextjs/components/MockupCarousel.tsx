@@ -135,39 +135,28 @@ export default function MockupCarousel() {
   }
 
   const handleTouchStart = (e: TouchEvent<HTMLDivElement>) => {
-    if (!carouselRef.current || isScrollingRef.current) return
-    setIsDragging(true)
+    // No mobile, deixar o scroll nativo funcionar
+    // Apenas capturar posição inicial para detectar clique
+    if (!carouselRef.current) return
     const touch = e.touches[0]
-    setStartX(touch.pageX - carouselRef.current.offsetLeft)
-    setScrollLeft(carouselRef.current.scrollLeft)
     clickStartX.current = touch.pageX
     clickStartY.current = touch.pageY
     hasMoved.current = false
   }
 
-  const handleTouchMove = (e: TouchEvent<HTMLDivElement>) => {
-    if (!isDragging || !carouselRef.current || isScrollingRef.current) return
-    const touch = e.touches[0]
-    const x = touch.pageX - carouselRef.current.offsetLeft
-    const walk = (x - startX) * 2.5 // Velocidade aumentada para scroll mais fluido
-    carouselRef.current.scrollLeft = scrollLeft - walk
-    
-    // Marcar que houve movimento
-    const deltaX = Math.abs(touch.pageX - clickStartX.current)
-    const deltaY = Math.abs(touch.pageY - clickStartY.current)
-    if (deltaX > 10 || deltaY > 10) {
-      hasMoved.current = true
-    }
+  const handleTouchMove = () => {
+    // Não interferir no scroll nativo no mobile
+    // Apenas marcar que houve movimento
+    hasMoved.current = true
   }
 
   const handleTouchEnd = (e?: TouchEvent<HTMLDivElement>) => {
     if (!carouselRef.current) {
-      setIsDragging(false)
       hasMoved.current = false
       return
     }
     
-    // Verificar se foi um toque (não um arrasto)
+    // Verificar se foi um toque (não um scroll)
     if (e && !hasMoved.current) {
       const touch = e.changedTouches[0]
       const target = document.elementFromPoint(touch.pageX, touch.pageY)
@@ -181,10 +170,7 @@ export default function MockupCarousel() {
       }
     }
     
-    setIsDragging(false)
     hasMoved.current = false
-    // Não fazer snap, deixar scroll livre e fluido
-    updateCurrentIndex()
   }
 
   const updateCurrentIndex = () => {
@@ -281,6 +267,8 @@ export default function MockupCarousel() {
     // Se não funcionar, tentar após um pequeno delay
     const timeoutId = setTimeout(initCarousel, 100)
 
+    let scrollTimeout: NodeJS.Timeout | null = null
+
     const handleScroll = () => {
       if (isScrollingRef.current) return
       const itemWidth = getItemWidth()
@@ -294,18 +282,35 @@ export default function MockupCarousel() {
       const realIndex = newIndex % mockups.length
       setCurrentIndex(realIndex)
 
-      // Resetar posição para criar loop infinito (sem animação, imperceptível)
-      if (scrollPosition < middleSection - itemWidth * 2) {
-        carousel.scrollLeft = scrollPosition + middleSection
-      } else if (scrollPosition > middleSection * 2 + itemWidth * 2) {
-        carousel.scrollLeft = scrollPosition - middleSection
+      // Limpar timeout anterior
+      if (scrollTimeout) {
+        clearTimeout(scrollTimeout)
       }
+
+      // Apenas resetar posição após o scroll parar (para evitar glitches durante scroll)
+      scrollTimeout = setTimeout(() => {
+        if (!carouselRef.current) return
+        const currentScroll = carouselRef.current.scrollLeft
+        const currentItemWidth = getItemWidth()
+        if (currentItemWidth === 0) return
+        const currentMiddleSection = currentItemWidth * mockups.length
+        
+        // Resetar posição para criar loop infinito (apenas quando scroll parou)
+        if (currentScroll < currentMiddleSection - currentItemWidth * 2) {
+          carouselRef.current.scrollLeft = currentScroll + currentMiddleSection
+        } else if (currentScroll > currentMiddleSection * 2 + currentItemWidth * 2) {
+          carouselRef.current.scrollLeft = currentScroll - currentMiddleSection
+        }
+      }, 150) // Aguardar 150ms após scroll parar
     }
 
     carousel.addEventListener('scroll', handleScroll, { passive: true })
     
     return () => {
       clearTimeout(timeoutId)
+      if (scrollTimeout) {
+        clearTimeout(scrollTimeout)
+      }
       carousel.removeEventListener('scroll', handleScroll)
     }
   }, [])

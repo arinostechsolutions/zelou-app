@@ -78,7 +78,7 @@
   -khtml-user-drag: none;
   -moz-user-drag: none;
   -o-user-drag: none;
-  touch-action: pan-x pan-y pinch-zoom; /* Permite scroll fluido */
+  touch-action: pan-x; /* Apenas scroll horizontal, mais fluido no mobile */
   width: 100%;
   max-width: 100%;
   scroll-snap-type: none; /* Removido snap para scroll fluido como roda */
@@ -374,10 +374,7 @@
   }
 
   .carousel-nav-button {
-    width: 40px;
-    height: 40px;
-    font-size: 1.25rem;
-    flex-shrink: 0;
+    display: none; /* Remover botões de navegação no mobile */
   }
 
   .mockup-carousel {
