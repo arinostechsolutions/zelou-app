@@ -331,7 +331,7 @@ export default function MockupCarousel() {
 
   return (
     <section className="mockup-carousel-section">
-      <div className="container" style={{ maxWidth: '100%', padding: '0 20px' }}>
+      <div className="container">
         <div className="section-header">
           <h2 className="section-title">Conheça o Zelou</h2>
           <p className="section-subtitle">

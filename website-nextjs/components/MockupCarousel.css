@@ -13,9 +13,16 @@
   z-index: 1;
   width: 100%;
   max-width: 100%;
-  padding: 0 0;
+  padding: 0 20px;
   overflow-x: visible;
   overflow-y: visible;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .mockup-carousel-section .container {
+    padding: 0;
+  }
 }
 
 .section-header {
@@ -46,6 +53,7 @@
   align-items: center;
   gap: 20px;
   width: 100%;
+  max-width: 100%;
   overflow-x: visible;
   overflow-y: visible;
   margin: 0;
@@ -72,6 +80,7 @@
   -o-user-drag: none;
   touch-action: pan-x pan-y pinch-zoom; /* Permite scroll fluido */
   width: 100%;
+  max-width: 100%;
   scroll-snap-type: none; /* Removido snap para scroll fluido como roda */
   will-change: scroll-position; /* Otimização de performance */
 }
@@ -130,6 +139,7 @@
   flex: 0 0 auto;
   width: 320px;
   min-width: 320px;
+  max-width: 100%;
   animation: fadeInUp 0.6s ease-out both;
   overflow: visible;
   scroll-snap-align: none; /* Removido snap */
@@ -303,7 +313,9 @@
 @media (max-width: 968px) {
   .carousel-wrapper {
     gap: 12px;
-    padding: 0 30px !important;
+    padding: 0;
+    width: 100%;
+    max-width: 100%;
   }
 
   .carousel-nav-button {
@@ -356,33 +368,42 @@
 
   .carousel-wrapper {
     gap: 8px;
-    padding: 0 20px !important;
+    padding: 0;
+    width: 100%;
+    max-width: 100%;
   }
 
   .carousel-nav-button {
     width: 40px;
     height: 40px;
     font-size: 1.25rem;
+    flex-shrink: 0;
   }
 
   .mockup-carousel {
-    gap: 32px;
+    gap: 24px;
     padding: 40px 0;
+    width: 100%;
+    max-width: 100%;
   }
 
   .mockup-carousel::before,
   .mockup-carousel::after {
-    flex: 0 0 40px;
-    min-width: 40px;
+    flex: 0 0 20px;
+    min-width: 20px;
+    max-width: 20px;
   }
 
   .mockup-slide {
-    width: 240px;
-    min-width: 240px;
+    width: 280px;
+    min-width: 280px;
+    max-width: 280px;
+    flex-shrink: 0;
   }
 
   .mockup-frame {
     width: 200px;
+    max-width: 100%;
     padding: 8px;
     border-radius: 20px;
   }
@@ -395,6 +416,7 @@
   .mockup-title {
     font-size: 0.95rem;
     width: 200px;
+    max-width: 100%;
   }
 
   .carousel-indicators {

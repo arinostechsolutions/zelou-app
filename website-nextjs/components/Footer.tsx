@@ -56,6 +56,7 @@ export default function Footer() {
 
         <div className="footer-bottom">
           <p>&copy; {currentYear} Zelou. Todos os direitos reservados.</p>
+          <p className="footer-distributor">Distribuído por AG2 Soluções Tecnológicas</p>
         </div>
       </div>
     </footer>
