@@ -1,0 +1,552 @@
+.mockup-carousel-section {
+  padding: 100px 0;
+  background: #ffffff;
+  position: relative;
+  overflow-x: hidden; /* Apenas horizontal para evitar scroll horizontal na página */
+  overflow-y: visible;
+  width: 100%;
+}
+
+
+.mockup-carousel-section .container {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 100%;
+  padding: 0 0;
+  overflow-x: visible;
+  overflow-y: visible;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 80px;
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.section-title {
+  font-size: 2.75rem;
+  font-weight: 700;
+  color: #1E293B;
+  margin-bottom: 20px;
+  letter-spacing: -0.02em;
+}
+
+.section-subtitle {
+  font-size: 1.35rem;
+  color: #64748B;
+  max-width: 700px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.carousel-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  overflow-x: visible;
+  overflow-y: visible;
+  margin: 0;
+  padding: 0;
+}
+
+.mockup-carousel {
+  display: flex;
+  overflow-x: auto;
+  overflow-y: visible;
+  scroll-behavior: auto; /* Auto para scroll livre e fluido */
+  -webkit-overflow-scrolling: touch; /* Momentum scrolling no iOS */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  gap: 60px;
+  padding: 60px 0;
+  flex: 1;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: grab;
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  touch-action: pan-x pan-y pinch-zoom; /* Permite scroll fluido */
+  width: 100%;
+  scroll-snap-type: none; /* Removido snap para scroll fluido como roda */
+  will-change: scroll-position; /* Otimização de performance */
+}
+
+.mockup-carousel::before,
+.mockup-carousel::after {
+  content: '';
+  flex: 0 0 160px; /* Padding grande nas bordas para garantir visibilidade total */
+  min-width: 160px;
+}
+
+.mockup-carousel:active {
+  cursor: grabbing !important;
+}
+
+.mockup-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+.mockup-slide {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.mockup-slide * {
+  pointer-events: none;
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.mockup-slide:not(.dragging):hover .mockup-frame {
+  transform: scale(1.05);
+  box-shadow: 
+    0 30px 100px rgba(0, 0, 0, 0.3),
+    0 12px 40px rgba(0, 0, 0, 0.2);
+}
+
+.mockup-image {
+  pointer-events: none !important;
+  -webkit-user-drag: none !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -webkit-touch-callout: none !important;
+}
+
+.mockup-carousel::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+.mockup-slide {
+  flex: 0 0 auto;
+  width: 320px;
+  min-width: 320px;
+  animation: fadeInUp 0.6s ease-out both;
+  overflow: visible;
+  scroll-snap-align: none; /* Removido snap */
+}
+
+.mockup-slide:nth-child(1) { animation-delay: 0.1s; }
+.mockup-slide:nth-child(2) { animation-delay: 0.2s; }
+.mockup-slide:nth-child(3) { animation-delay: 0.3s; }
+.mockup-slide:nth-child(4) { animation-delay: 0.4s; }
+.mockup-slide:nth-child(5) { animation-delay: 0.5s; }
+.mockup-slide:nth-child(6) { animation-delay: 0.6s; }
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mockup-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  width: 100%;
+  overflow: visible;
+}
+
+.mockup-frame {
+  position: relative;
+  width: 280px;
+  height: auto;
+  aspect-ratio: 9 / 19.5; /* Proporção de um celular moderno */
+  background: #000000;
+  border-radius: 28px;
+  padding: 10px;
+  box-shadow: 
+    0 25px 80px rgba(0, 0, 0, 0.25),
+    0 10px 30px rgba(0, 0, 0, 0.15);
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 3px solid #1a1a1a;
+  flex-shrink: 0;
+  overflow: visible;
+  cursor: pointer;
+}
+
+.mockup-frame::before {
+  content: '';
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 20px;
+  background: #000000;
+  border-radius: 0 0 12px 12px;
+  z-index: 1;
+}
+
+.mockup-frame::after {
+  content: '';
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 4px;
+  background: #1a1a1a;
+  border-radius: 2px;
+  z-index: 1;
+}
+
+.mockup-image {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 20px;
+  overflow: hidden;
+  object-fit: cover;
+  background: #000;
+}
+
+.mockup-title {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #1E293B;
+  text-align: center;
+  padding: 0;
+  background: transparent;
+  width: 280px;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+  overflow: visible;
+}
+
+.carousel-nav-button {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid #E2E8F0;
+  color: #1E293B;
+  font-size: 1.75rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  flex-shrink: 0;
+  z-index: 2;
+}
+
+.carousel-nav-button:hover {
+  transform: scale(1.05);
+  border-color: var(--primary);
+  color: var(--primary);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.carousel-nav-button:active {
+  transform: scale(0.95);
+}
+
+.carousel-nav-button span {
+  line-height: 1;
+  font-weight: 300;
+  display: block;
+}
+
+.carousel-indicators {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 60px;
+  padding: 0;
+  background: transparent;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid #CBD5E1;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 0;
+}
+
+.indicator:hover {
+  background: #CBD5E1;
+  border-color: #CBD5E1;
+  transform: scale(1.2);
+}
+
+.indicator.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  width: 28px;
+  border-radius: 5px;
+}
+
+@media (max-width: 968px) {
+  .carousel-wrapper {
+    gap: 12px;
+    padding: 0 30px !important;
+  }
+
+  .carousel-nav-button {
+    width: 44px;
+    height: 44px;
+    font-size: 1.5rem;
+  }
+
+  .mockup-carousel {
+    gap: 40px;
+    padding: 50px 0;
+  }
+
+  .mockup-carousel::before,
+  .mockup-carousel::after {
+    flex: 0 0 60px;
+    min-width: 60px;
+  }
+
+  .mockup-slide {
+    width: 280px;
+    min-width: 280px;
+  }
+
+  .mockup-frame {
+    width: 240px;
+  }
+
+  .mockup-title {
+    width: 240px;
+  }
+}
+
+@media (max-width: 768px) {
+  .mockup-carousel-section {
+    padding: 80px 0;
+  }
+
+  .section-header {
+    margin-bottom: 60px;
+  }
+
+  .section-title {
+    font-size: 2rem;
+  }
+
+  .section-subtitle {
+    font-size: 1.15rem;
+  }
+
+  .carousel-wrapper {
+    gap: 8px;
+    padding: 0 20px !important;
+  }
+
+  .carousel-nav-button {
+    width: 40px;
+    height: 40px;
+    font-size: 1.25rem;
+  }
+
+  .mockup-carousel {
+    gap: 32px;
+    padding: 40px 0;
+  }
+
+  .mockup-carousel::before,
+  .mockup-carousel::after {
+    flex: 0 0 40px;
+    min-width: 40px;
+  }
+
+  .mockup-slide {
+    width: 240px;
+    min-width: 240px;
+  }
+
+  .mockup-frame {
+    width: 200px;
+    padding: 8px;
+    border-radius: 20px;
+  }
+
+  .mockup-frame::before {
+    width: 80px;
+    height: 16px;
+  }
+
+  .mockup-title {
+    font-size: 0.95rem;
+    width: 200px;
+  }
+
+  .carousel-indicators {
+    margin-top: 40px;
+    gap: 8px;
+  }
+
+  .indicator {
+    width: 8px;
+    height: 8px;
+  }
+
+  .indicator.active {
+    width: 20px;
+  }
+}
+
+/* Modal Styles */
+.mockup-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  animation: fadeIn 0.3s ease-out;
+  overflow-y: auto;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.mockup-modal-content {
+  position: relative;
+  background: #ffffff;
+  border-radius: 24px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 
+    0 25px 80px rgba(0, 0, 0, 0.4),
+    0 10px 30px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.mockup-modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.1);
+  border: none;
+  color: #1E293B;
+  font-size: 2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  line-height: 1;
+  padding: 0;
+}
+
+.mockup-modal-close:hover {
+  background: rgba(0, 0, 0, 0.15);
+  transform: scale(1.1);
+  color: var(--primary);
+}
+
+.mockup-modal-close:active {
+  transform: scale(0.95);
+}
+
+.mockup-modal-info {
+  padding: 40px;
+}
+
+.mockup-modal-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1E293B;
+  margin-bottom: 16px;
+  letter-spacing: -0.02em;
+}
+
+.mockup-modal-description {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: #64748B;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .mockup-modal-overlay {
+    padding: 16px;
+  }
+
+  .mockup-modal-content {
+    max-width: 100%;
+    border-radius: 20px;
+  }
+
+  .mockup-modal-close {
+    width: 36px;
+    height: 36px;
+    font-size: 1.75rem;
+    top: 12px;
+    right: 12px;
+  }
+
+  .mockup-modal-info {
+    padding: 28px 20px;
+  }
+
+  .mockup-modal-title {
+    font-size: 1.5rem;
+    margin-bottom: 12px;
+  }
+
+  .mockup-modal-description {
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+}
+
