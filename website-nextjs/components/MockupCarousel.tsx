@@ -142,12 +142,29 @@ export default function MockupCarousel() {
     clickStartX.current = touch.pageX
     clickStartY.current = touch.pageY
     hasMoved.current = false
+    // Não prevenir comportamento padrão para permitir scroll vertical
   }
 
-  const handleTouchMove = () => {
-    // Não interferir no scroll nativo no mobile
-    // Apenas marcar que houve movimento
-    hasMoved.current = true
+  const handleTouchMove = (e: TouchEvent<HTMLDivElement>) => {
+    // Verificar direção do movimento
+    if (!carouselRef.current || !e.touches[0]) return
+    
+    const touch = e.touches[0]
+    const deltaX = Math.abs(touch.pageX - clickStartX.current)
+    const deltaY = Math.abs(touch.pageY - clickStartY.current)
+    
+    // Se movimento vertical for maior que horizontal, é scroll da página
+    // Marcar movimento mas não interferir
+    if (deltaY > deltaX && deltaY > 10) {
+      // Scroll vertical - não fazer nada, deixar página scrollar
+      hasMoved.current = true
+      return
+    }
+    
+    // Movimento horizontal - marcar mas não interferir (scroll nativo cuida)
+    if (deltaX > 10 || deltaY > 10) {
+      hasMoved.current = true
+    }
   }
 
   const handleTouchEnd = (e?: TouchEvent<HTMLDivElement>) => {

@@ -78,7 +78,7 @@
   -khtml-user-drag: none;
   -moz-user-drag: none;
   -o-user-drag: none;
-  touch-action: pan-x; /* Apenas scroll horizontal, mais fluido no mobile */
+  touch-action: pan-x pan-y pinch-zoom; /* Permite scroll horizontal e vertical */
   width: 100%;
   max-width: 100%;
   scroll-snap-type: none; /* Removido snap para scroll fluido como roda */
@@ -382,6 +382,7 @@
     padding: 40px 0;
     width: 100%;
     max-width: 100%;
+    touch-action: pan-x pan-y pinch-zoom; /* Permite scroll vertical na página também */
   }
 
   .mockup-carousel::before,
