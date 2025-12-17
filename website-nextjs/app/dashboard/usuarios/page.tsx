@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { usersApi } from '@/lib/api'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
+import { X as XIcon } from 'lucide-react'
 import './page.css'
 
 interface User {
@@ -134,7 +135,7 @@ export default function UsuariosPage() {
 
       {error && (
         <div className="error-alert">
-          <p><X size={18} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '8px' }} />{error}</p>
+          <p><XIcon size={18} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '8px' }} />{error}</p>
           <button onClick={loadUsers} className="retry-button">
             Tentar novamente
           </button>
