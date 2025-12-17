@@ -227,11 +227,42 @@
 @media (max-width: 768px) {
   .reservations-grid {
     grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .reservation-card {
+    padding: 20px;
   }
 
   .page-header {
     flex-direction: column;
     align-items: flex-start;
+    gap: 16px;
+  }
+
+  .header-actions {
+    width: 100%;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .toggle-btn,
+  .filter-btn {
+    width: 100%;
+    padding: 12px;
+  }
+
+  .reservation-content {
+    font-size: 0.9rem;
+  }
+
+  .reservation-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .action-btn {
+    width: 100%;
   }
 }
 

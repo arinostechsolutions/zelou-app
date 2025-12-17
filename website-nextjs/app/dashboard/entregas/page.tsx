@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo } from 'react'
 import { deliveriesApi } from '@/lib/api'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
-import { X, User as UserIcon, Calendar } from 'lucide-react'
+import { X, User as UserIcon, Calendar, Check, Package as PackageIcon } from 'lucide-react'
 import './page.css'
 
 interface Delivery {
@@ -187,7 +187,7 @@ export default function EntregasPage() {
                 </div>
                 {delivery.retrievedAt && (
                   <div className="info-item">
-                    <span className="info-label">✅ Retirada em:</span>
+                    <span className="info-label"><Check size={16} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '4px' }} />Retirada em:</span>
                     <span className="info-value">
                       {format(new Date(delivery.retrievedAt), "dd 'de' MMMM 'de' yyyy 'às' HH:mm", { locale: ptBR })}
                     </span>
@@ -201,7 +201,7 @@ export default function EntregasPage() {
 
       {deliveries.length === 0 && !loading && (
         <div className="empty-state">
-          <p>📦 Nenhuma entrega encontrada</p>
+          <p><PackageIcon size={20} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '8px' }} />Nenhuma entrega encontrada</p>
         </div>
       )}
     </div>

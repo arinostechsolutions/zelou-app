@@ -398,25 +398,40 @@
   .stats-grid,
   .charts-grid {
     grid-template-columns: 1fr;
+    gap: 16px;
   }
 
   .growth-cards,
   .api-usage-grid {
     grid-template-columns: 1fr;
+    gap: 16px;
   }
 
   .condominiums-table {
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .condominiums-table table {
     min-width: 600px;
+    font-size: 0.9rem;
   }
 
   .cache-indicator {
     flex-direction: column;
     gap: 10px;
     align-items: flex-start;
+    padding: 12px;
+    font-size: 0.9rem;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .subsection-title {
+    font-size: 1.25rem;
   }
 }
 

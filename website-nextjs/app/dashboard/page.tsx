@@ -5,7 +5,7 @@ import { useStatistics } from '@/hooks/useStatistics'
 import StatsCard from '@/components/dashboard/StatsCard'
 import StatsChart from '@/components/dashboard/StatsChart'
 import RecentActivity from '@/components/dashboard/RecentActivity'
-import { X, Building2, Users, Package, AlertCircle, Calendar, TrendingUp } from 'lucide-react'
+import { X, Building2, Users, Package, AlertCircle, Calendar, TrendingUp, AlertTriangle, BarChart3 } from 'lucide-react'
 import './page.css'
 
 export default function DashboardPage() {
@@ -65,7 +65,7 @@ export default function DashboardPage() {
     <div className="dashboard-page">
       {isStale && (
         <div className="cache-indicator">
-          <span>⚠️ Dados podem estar desatualizados</span>
+          <AlertTriangle size={18} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '8px' }} />Dados podem estar desatualizados
           <button onClick={refetch} className="refresh-button">
             Atualizar agora
           </button>
@@ -159,7 +159,7 @@ export default function DashboardPage() {
       {/* Métricas avançadas apenas para Master Admin */}
       {user?.isMasterAdmin && stats.masterAdminMetrics && (
         <div className="master-admin-metrics">
-          <h2 className="section-title">📊 Métricas Avançadas (Master Admin)</h2>
+          <h2 className="section-title"><BarChart3 size={28} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '12px' }} />Métricas Avançadas (Master Admin)</h2>
           
           {/* Taxa de Crescimento */}
           <div className="growth-rates-section">

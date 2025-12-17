@@ -207,10 +207,20 @@
 
   .header-controls {
     flex-direction: column;
+    gap: 12px;
   }
 
   .search-box {
     width: 100%;
+  }
+
+  .users-table {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .users-table table {
+    min-width: 600px;
   }
 }
 

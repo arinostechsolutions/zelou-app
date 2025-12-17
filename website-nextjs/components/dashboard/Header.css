@@ -16,6 +16,25 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 16px;
+}
+
+.menu-toggle-button {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  align-items: center;
+  justify-content: center;
+}
+
+.menu-toggle-button:hover {
+  background: var(--bg-light);
+  color: var(--primary);
 }
 
 .header-title {
@@ -73,6 +92,12 @@
   left: 100%;
 }
 
+@media (max-width: 1024px) {
+  .menu-toggle-button {
+    display: flex;
+  }
+}
+
 @media (max-width: 768px) {
   .dashboard-header {
     padding: 15px 20px;
@@ -83,9 +108,23 @@
   }
 
   .header-content {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .header-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .header-condo {
+    width: 100%;
+  }
+
+  .condo-badge {
+    width: 100%;
+    text-align: center;
+    padding: 8px 16px;
+    font-size: 0.85rem;
   }
 }
 

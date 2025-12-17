@@ -315,11 +315,32 @@
 @media (max-width: 768px) {
   .reports-grid {
     grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .report-card {
+    padding: 20px;
   }
 
   .page-header {
     flex-direction: column;
     align-items: flex-start;
+    gap: 16px;
+  }
+
+  .report-content {
+    font-size: 0.9rem;
+  }
+
+  .report-image {
+    height: 200px;
+  }
+
+  .report-location,
+  .report-user {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
   }
 }
 

@@ -192,9 +192,13 @@
 }
 
 .nav-icon {
-  font-size: 1.3rem;
   width: 24px;
-  text-align: center;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
+  flex-shrink: 0;
 }
 
 .nav-label {
@@ -234,6 +238,45 @@
 
   .dashboard-sidebar.open {
     transform: translateX(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-sidebar {
+    width: 260px;
+  }
+
+  .sidebar-header {
+    padding: 20px 16px;
+  }
+
+  .sidebar-title h2 {
+    font-size: 1.3rem;
+  }
+
+  .sidebar-user {
+    padding: 16px;
+  }
+
+  .user-avatar {
+    width: 44px;
+    height: 44px;
+    font-size: 1.1rem;
+  }
+
+  .nav-item {
+    padding: 12px 16px;
+    margin: 4px 8px;
+    font-size: 0.9rem;
+  }
+
+  .nav-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .sidebar-footer {
+    padding: 16px;
   }
 }
 

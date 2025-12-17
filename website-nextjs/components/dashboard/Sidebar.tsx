@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
+import { BarChart3, AlertTriangle, Calendar, Package, Users, LogOut } from 'lucide-react'
 import './Sidebar.css'
 
 interface User {
@@ -51,11 +52,11 @@ export default function DashboardSidebar() {
   }
 
   const menuItems = [
-    { path: '/dashboard', icon: '📊', label: 'Dashboard', exact: true },
-    { path: '/dashboard/irregularidades', icon: '⚠️', label: 'Irregularidades' },
-    { path: '/dashboard/reservas', icon: '📅', label: 'Reservas' },
-    { path: '/dashboard/entregas', icon: '📦', label: 'Entregas' },
-    { path: '/dashboard/usuarios', icon: '👥', label: 'Usuários' },
+    { path: '/dashboard', icon: <BarChart3 size={20} />, label: 'Dashboard', exact: true },
+    { path: '/dashboard/irregularidades', icon: <AlertTriangle size={20} />, label: 'Irregularidades' },
+    { path: '/dashboard/reservas', icon: <Calendar size={20} />, label: 'Reservas' },
+    { path: '/dashboard/entregas', icon: <Package size={20} />, label: 'Entregas' },
+    { path: '/dashboard/usuarios', icon: <Users size={20} />, label: 'Usuários' },
   ]
 
   return (
@@ -100,7 +101,7 @@ export default function DashboardSidebar() {
               className={`nav-item ${isActive ? 'active' : ''}`}
               prefetch={true}
             >
-              <span className="nav-icon">{item.icon}</span>
+              <span className="nav-icon" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{item.icon}</span>
               <span className="nav-label">{item.label}</span>
             </Link>
           )
@@ -109,7 +110,7 @@ export default function DashboardSidebar() {
 
       <div className="sidebar-footer">
         <button onClick={handleLogout} className="logout-button">
-          <span className="nav-icon">🚪</span>
+          <span className="nav-icon" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><LogOut size={20} /></span>
           <span className="nav-label">Sair</span>
         </button>
       </div>
