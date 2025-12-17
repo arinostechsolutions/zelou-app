@@ -68,23 +68,29 @@
   }
 }
 
+.step-card {
+  transition: var(--transition-smooth);
+}
+
 .step-card:hover {
-  transform: translateY(-8px) scale(1.03);
-  box-shadow: 0 15px 40px rgba(28, 168, 168, 0.25);
+  transform: translateY(-6px);
+  box-shadow: 0 12px 32px rgba(28, 168, 168, 0.15);
   border-top: 3px solid var(--primary);
+  background: linear-gradient(to bottom, white, #fafafa);
 }
 
 .step-icon {
-  transition: transform 0.3s ease;
+  margin-bottom: 20px;
+  transition: var(--transition-smooth);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--primary);
 }
 
 .step-card:hover .step-icon {
-  transform: scale(1.15) rotate(5deg);
-}
-
-.step-icon {
-  font-size: 4rem;
-  margin-bottom: 20px;
+  transform: scale(1.1);
+  color: var(--primary-hover);
 }
 
 .step-title {

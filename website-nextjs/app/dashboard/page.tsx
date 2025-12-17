@@ -5,6 +5,7 @@ import { useStatistics } from '@/hooks/useStatistics'
 import StatsCard from '@/components/dashboard/StatsCard'
 import StatsChart from '@/components/dashboard/StatsChart'
 import RecentActivity from '@/components/dashboard/RecentActivity'
+import { X, Building2, Users, Package, AlertCircle, Calendar, TrendingUp } from 'lucide-react'
 import './page.css'
 
 export default function DashboardPage() {
@@ -48,7 +49,7 @@ export default function DashboardPage() {
   if (error) {
     return (
       <div className="dashboard-error">
-        <p>❌ {error}</p>
+        <p><X size={18} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '8px' }} />{error}</p>
         <button onClick={refetch} className="retry-button">
           Tentar novamente
         </button>
@@ -75,14 +76,14 @@ export default function DashboardPage() {
           <StatsCard
             title="Total de Condomínios"
             value={stats.overview?.totalCondominiums || 0}
-            icon="🏢"
+            icon={<Building2 size={24} />}
             color="#8B5CF6"
           />
         )}
         <StatsCard
           title="Total de Usuários"
           value={stats.overview?.totalUsers || 0}
-          icon="👥"
+            icon={<Users size={24} />}
           color="#1ca8a8"
           trend={stats.recentActivity?.users || 0}
           trendLabel="novos (7 dias)"
@@ -90,7 +91,7 @@ export default function DashboardPage() {
         <StatsCard
           title="Irregularidades"
           value={stats.overview?.totalReports || 0}
-          icon="⚠️"
+            icon={<AlertCircle size={24} />}
           color="#EF4444"
           trend={stats.recentActivity?.reports || 0}
           trendLabel="novas (7 dias)"
@@ -98,7 +99,7 @@ export default function DashboardPage() {
         <StatsCard
           title="Reservas"
           value={stats.overview?.totalReservations || 0}
-          icon="📅"
+            icon={<Calendar size={24} />}
           color="#10B981"
           trend={stats.recentActivity?.reservations || 0}
           trendLabel="novas (7 dias)"
@@ -106,7 +107,7 @@ export default function DashboardPage() {
         <StatsCard
           title="Entregas"
           value={stats.overview?.totalDeliveries || 0}
-          icon="📦"
+            icon={<Package size={24} />}
           color="#F59E0B"
           trend={stats.recentActivity?.deliveries || 0}
           trendLabel="novas (7 dias)"

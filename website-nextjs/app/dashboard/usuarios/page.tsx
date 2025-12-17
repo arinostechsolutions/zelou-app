@@ -134,7 +134,7 @@ export default function UsuariosPage() {
 
       {error && (
         <div className="error-alert">
-          <p>❌ {error}</p>
+          <p><X size={18} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '8px' }} />{error}</p>
           <button onClick={loadUsers} className="retry-button">
             Tentar novamente
           </button>

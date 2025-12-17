@@ -12,7 +12,7 @@ export default function Hero() {
           </h1>
           <p className="hero-description">
             O Zelou é a plataforma digital que facilita a vida de quem administra e mora em condomínio. 
-            Uma rede de gestão colaborativa completa para síndicos, administradores e moradores.
+            Uma rede de gestão colaborativa completa para síndicos, zeladores, porteiros e moradores.
           </p>
           <div className="hero-buttons">
             <Link href="/precos" className="btn btn-primary">

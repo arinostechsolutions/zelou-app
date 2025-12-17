@@ -37,6 +37,9 @@
   border: 2px solid transparent;
   animation: fadeInUp 0.6s ease-out both;
   overflow: visible;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .pricing-card::before {
@@ -138,6 +141,7 @@
   font-weight: 700;
   color: var(--primary);
   transition: transform 0.3s ease;
+  line-height: 1.2;
 }
 
 .pricing-card:hover .amount {
@@ -159,7 +163,7 @@
   list-style: none;
   text-align: left;
   margin-bottom: 30px;
-  min-height: 200px;
+  flex: 1;
 }
 
 .feature-item {
@@ -185,6 +189,7 @@
   width: 100%;
   padding: 16px;
   font-size: 1rem;
+  margin-top: auto;
 }
 
 @media (max-width: 768px) {

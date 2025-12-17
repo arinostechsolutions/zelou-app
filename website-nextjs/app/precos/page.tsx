@@ -6,8 +6,8 @@ import './page.css'
 export default function PrecosPage() {
   const plans = [
     {
-      name: 'Até 100 unidades',
-      price: '330,00',
+      name: 'Até 60 unidades',
+      price: '490,90',
       period: 'mensal',
       description: 'O valor mensal é fixo.',
       features: [
@@ -20,10 +20,10 @@ export default function PrecosPage() {
       popular: false
     },
     {
-      name: 'Até 250 unidades',
-      price: '2,50',
-      period: 'por unidade',
-      description: 'O valor mensal é calculado pelo número de unidades do condomínio.',
+      name: 'De 61 a 100 unidades',
+      price: '690,90',
+      period: 'mensal',
+      description: 'O valor mensal é fixo.',
       features: [
         'Taxa de Implantação',
         'Custo de Treinamento On-line',
@@ -34,10 +34,10 @@ export default function PrecosPage() {
       popular: true
     },
     {
-      name: 'Acima de 250 unidades',
-      price: '2,00',
-      period: 'por unidade',
-      description: 'O valor mensal é calculado pelo número de unidades do condomínio.',
+      name: 'De 101 a 200 unidades',
+      price: '879,90',
+      period: 'mensal',
+      description: 'O valor mensal é fixo.',
       features: [
         'Taxa de Implantação',
         'Custo de Treinamento On-line',
@@ -46,6 +46,36 @@ export default function PrecosPage() {
         'Todos os recursos básicos'
       ],
       popular: false
+    },
+    {
+      name: 'De 201 a 300 unidades',
+      price: '1.159,90',
+      period: 'mensal',
+      description: 'O valor mensal é fixo.',
+      features: [
+        'Taxa de Implantação',
+        'Custo de Treinamento On-line',
+        'Módulo Portaria',
+        'Módulo Encomendas',
+        'Todos os recursos básicos'
+      ],
+      popular: false
+    },
+    {
+      name: 'Acima de 300 unidades',
+      price: 'Consultar',
+      period: '',
+      description: 'Entre em contato para um orçamento personalizado.',
+      features: [
+        'Taxa de Implantação',
+        'Custo de Treinamento On-line',
+        'Módulo Portaria',
+        'Módulo Encomendas',
+        'Todos os recursos básicos',
+        'Atendimento personalizado'
+      ],
+      popular: false,
+      custom: true
     }
   ]
 
@@ -65,9 +95,15 @@ export default function PrecosPage() {
                   {plan.popular && <div className="popular-badge">Mais Popular</div>}
                   <h2 className="plan-name">{plan.name}</h2>
                   <div className="plan-price">
-                    <span className="currency">R$</span>
-                    <span className="amount">{plan.price}</span>
-                    <span className="period">/{plan.period}</span>
+                    {!plan.custom ? (
+                      <>
+                        <span className="currency">R$</span>
+                        <span className="amount">{plan.price}</span>
+                        <span className="period">/{plan.period}</span>
+                      </>
+                    ) : (
+                      <span className="amount" style={{ fontSize: '2.5rem' }}>{plan.price}</span>
+                    )}
                   </div>
                   <p className="plan-description">{plan.description}</p>
                   <ul className="plan-features">

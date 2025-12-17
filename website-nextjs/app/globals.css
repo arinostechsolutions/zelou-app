@@ -8,16 +8,21 @@
   --primary: #1ca8a8;
   --primary-dark: #159494;
   --primary-light: #2dd4d4;
+  --primary-hover: #17b3b3;
   --secondary: #0ea5e9;
+  --secondary-hover: #0d94d4;
   --accent: #10b981;
   --text: #1E293B;
   --text-secondary: #64748B;
   --bg: #FFFFFF;
   --bg-light: #F0FDFA;
   --border: #E2E8F0;
+  --border-hover: #CBD5E1;
   --shadow: rgba(28, 168, 168, 0.1);
+  --shadow-hover: rgba(28, 168, 168, 0.2);
   --gradient-start: #1ca8a8;
   --gradient-end: #0ea5e9;
+  --transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 html {
@@ -25,7 +30,7 @@ html {
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -33,6 +38,7 @@ body {
   color: var(--text);
   line-height: 1.6;
   overflow-x: hidden;
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
 }
 
 /* Otimizações de performance */
@@ -87,31 +93,43 @@ button {
   border-radius: 8px;
   font-weight: 600;
   font-size: 16px;
-  transition: all 0.3s ease;
+  transition: var(--transition-smooth);
   text-align: center;
+  position: relative;
+  overflow: hidden;
 }
 
 .btn-primary {
   background: linear-gradient(135deg, var(--primary), var(--gradient-end));
   color: white;
-  transition: all 0.3s ease;
+  transition: var(--transition-smooth);
+  box-shadow: 0 2px 8px rgba(28, 168, 168, 0.2);
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 25px rgba(28, 168, 168, 0.4);
-  background: linear-gradient(135deg, var(--primary-light), var(--secondary));
+  box-shadow: 0 8px 24px rgba(28, 168, 168, 0.35);
+  background: linear-gradient(135deg, var(--primary-hover), var(--secondary-hover));
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(28, 168, 168, 0.2);
 }
 
 .btn-secondary {
   background: white;
   color: var(--primary);
   border: 2px solid var(--primary);
+  transition: var(--transition-smooth);
 }
 
 .btn-secondary:hover {
   background: var(--primary);
   color: white;
+  border-color: var(--primary);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(28, 168, 168, 0.2);
 }
 
 @media (max-width: 768px) {

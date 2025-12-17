@@ -4,6 +4,7 @@ import { useEffect, useState, useMemo } from 'react'
 import { deliveriesApi } from '@/lib/api'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
+import { X, User as UserIcon, Calendar } from 'lucide-react'
 import './page.css'
 
 interface Delivery {
@@ -131,7 +132,7 @@ export default function EntregasPage() {
 
       {error && (
         <div className="error-alert">
-          <p>❌ {error}</p>
+          <p><X size={18} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '8px' }} />{error}</p>
           <button onClick={loadDeliveries} className="retry-button">
             Tentar novamente
           </button>
@@ -158,7 +159,7 @@ export default function EntregasPage() {
             <div className="delivery-content">
               <div className="delivery-info">
                 <div className="info-item">
-                  <span className="info-label">👤 Morador:</span>
+                  <span className="info-label"><UserIcon size={16} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '4px' }} />Morador:</span>
                   <span className="info-value">
                     {delivery.residentId ? (
                       <>
@@ -179,7 +180,7 @@ export default function EntregasPage() {
                   </div>
                 )}
                 <div className="info-item">
-                  <span className="info-label">📅 Recebida em:</span>
+                  <span className="info-label"><Calendar size={16} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '4px' }} />Recebida em:</span>
                   <span className="info-value">
                     {format(new Date(delivery.createdAt), "dd 'de' MMMM 'de' yyyy 'às' HH:mm", { locale: ptBR })}
                   </span>

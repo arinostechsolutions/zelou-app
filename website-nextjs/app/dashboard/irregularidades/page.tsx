@@ -7,6 +7,7 @@ import { useCachedData } from '@/hooks/useCachedData'
 import { CACHE_KEYS, CACHE_TTL } from '@/lib/cache'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
+import { MapPin, User as UserIcon, X, FileText } from 'lucide-react'
 import './page.css'
 
 interface Report {
@@ -137,7 +138,7 @@ export default function IrregularidadesPage() {
 
       {error && (
         <div className="error-alert">
-          <p>❌ {error}</p>
+          <p><X size={18} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '8px' }} />{error}</p>
           <button onClick={() => refetch()} className="retry-button">
             Tentar novamente
           </button>
@@ -160,11 +161,11 @@ export default function IrregularidadesPage() {
             <div className="report-content">
               <p className="report-description">{report.description}</p>
               <div className="report-location">
-                <span className="location-icon">📍</span>
+                <span className="location-icon"><MapPin size={16} /></span>
                 {report.location}
               </div>
               <div className="report-user">
-                <span className="user-icon">👤</span>
+                <span className="user-icon"><UserIcon size={16} /></span>
                 {report.userId.name} - {report.userId.unit.block ? `${report.userId.unit.block} - ` : ''}{report.userId.unit.number}
               </div>
               <div className="report-date">
@@ -205,7 +206,7 @@ export default function IrregularidadesPage() {
 
       {(!reports || reports.length === 0) && !loading && (
         <div className="empty-state">
-          <p>📋 Nenhuma irregularidade encontrada</p>
+          <p><FileText size={20} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '8px' }} />Nenhuma irregularidade encontrada</p>
         </div>
       )}
 

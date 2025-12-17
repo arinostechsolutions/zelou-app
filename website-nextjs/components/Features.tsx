@@ -1,3 +1,4 @@
+import { BarChart3, Smartphone, Bell } from 'lucide-react'
 import './Features.css'
 
 export default function Features() {
@@ -10,7 +11,7 @@ export default function Features() {
         </p>
         <div className="features-content">
           <div className="feature-item">
-            <div className="feature-icon">📊</div>
+            <div className="feature-icon"><BarChart3 size={32} /></div>
             <h3 className="feature-title">Painel Administrativo</h3>
             <p className="feature-description">
               O Zelou tem uma excelente interface para a administração visualizar e controlar 
@@ -18,7 +19,7 @@ export default function Features() {
             </p>
           </div>
           <div className="feature-item">
-            <div className="feature-icon">📱</div>
+            <div className="feature-icon"><Smartphone size={32} /></div>
             <h3 className="feature-title">Aplicativo Mobile</h3>
             <p className="feature-description">
               Moradores utilizam a plataforma baixando o aplicativo na Apple Store (iOS) ou 
@@ -26,7 +27,7 @@ export default function Features() {
             </p>
           </div>
           <div className="feature-item">
-            <div className="feature-icon">🔔</div>
+            <div className="feature-icon"><Bell size={32} /></div>
             <h3 className="feature-title">Alertas em Tempo Real</h3>
             <p className="feature-description">
               A administração é avisada por meio de alertas no painel quando o morador faz 

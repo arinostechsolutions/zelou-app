@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { reservationsApi } from '@/lib/api'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
+import { X, User as UserIcon, Calendar, FileText, Check, Clock } from 'lucide-react'
 import './page.css'
 
 interface Reservation {
@@ -118,7 +119,7 @@ export default function ReservasPage() {
             className={`toggle-btn ${showPending ? 'active' : ''}`}
             onClick={() => setShowPending(!showPending)}
           >
-            {showPending ? '📋 Pendentes' : '📅 Todas'}
+            {showPending ? <><FileText size={18} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '6px' }} />Pendentes</> : <><Calendar size={18} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '6px' }} />Todas</>}
           </button>
           {!showPending && (
             <div className="filters">
@@ -153,7 +154,7 @@ export default function ReservasPage() {
 
       {error && (
         <div className="error-alert">
-          <p>❌ {error}</p>
+          <p><X size={18} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '8px' }} />{error}</p>
           <button onClick={loadReservations} className="retry-button">
             Tentar novamente
           </button>
@@ -176,24 +177,24 @@ export default function ReservasPage() {
             <div className="reservation-content">
               <div className="reservation-info">
                 <div className="info-item">
-                  <span className="info-label">📅 Data:</span>
+                  <span className="info-label"><Calendar size={16} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '4px' }} />Data:</span>
                   <span className="info-value">
                     {format(new Date(reservation.date), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
                   </span>
                 </div>
                 <div className="info-item">
-                  <span className="info-label">🕐 Horário:</span>
+                  <span className="info-label"><Clock size={16} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '4px' }} />Horário:</span>
                   <span className="info-value">{reservation.timeSlot}</span>
                 </div>
                 <div className="info-item">
-                  <span className="info-label">👤 Morador:</span>
+                  <span className="info-label"><UserIcon size={16} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '4px' }} />Morador:</span>
                   <span className="info-value">
                     {reservation.userId.name} - {reservation.userId.unit.block ? `${reservation.userId.unit.block} - ` : ''}{reservation.userId.unit.number}
                   </span>
                 </div>
                 {reservation.approvedBy && (
                   <div className="info-item">
-                    <span className="info-label">✅ Aprovada por:</span>
+                    <span className="info-label"><Check size={16} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '4px' }} />Aprovada por:</span>
                     <span className="info-value">{reservation.approvedBy.name}</span>
                   </div>
                 )}
@@ -206,13 +207,13 @@ export default function ReservasPage() {
                   className="action-btn approve-btn"
                   onClick={() => handleApprove(reservation._id)}
                 >
-                  ✅ Aprovar
+                  <Check size={18} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '6px' }} />Aprovar
                 </button>
                 <button
                   className="action-btn reject-btn"
                   onClick={() => handleReject(reservation._id)}
                 >
-                  ❌ Rejeitar
+                  <X size={18} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '6px' }} />Rejeitar
                 </button>
               </div>
             )}
@@ -222,7 +223,7 @@ export default function ReservasPage() {
 
       {reservations.length === 0 && !loading && (
         <div className="empty-state">
-          <p>📅 Nenhuma reserva encontrada</p>
+          <p><Calendar size={20} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '8px' }} />Nenhuma reserva encontrada</p>
         </div>
       )}
     </div>

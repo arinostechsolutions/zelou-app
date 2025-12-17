@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import { User, Mail, Phone, Building2, Home, MessageSquare } from 'lucide-react'
 import './page.css'
 
 export default function ContatoPage() {
@@ -92,7 +93,7 @@ export default function ContatoPage() {
                 
                 <div className="form-group">
                   <label htmlFor="name">
-                    <span className="label-icon">👤</span>
+                    <span className="label-icon"><User size={18} /></span>
                     Nome *
                   </label>
                   <input
@@ -108,7 +109,7 @@ export default function ContatoPage() {
 
                 <div className="form-group">
                   <label htmlFor="email">
-                    <span className="label-icon">📧</span>
+                    <span className="label-icon"><Mail size={18} /></span>
                     Email *
                   </label>
                   <input
@@ -124,7 +125,7 @@ export default function ContatoPage() {
 
                 <div className="form-group">
                   <label htmlFor="phone">
-                    <span className="label-icon">📱</span>
+                    <span className="label-icon"><Phone size={18} /></span>
                     Telefone/WhatsApp
                   </label>
                   <input
@@ -139,7 +140,7 @@ export default function ContatoPage() {
 
                 <div className="form-group">
                   <label htmlFor="condominium">
-                    <span className="label-icon">🏢</span>
+                    <span className="label-icon"><Building2 size={18} /></span>
                     Nome do Condomínio
                   </label>
                   <input
@@ -154,7 +155,7 @@ export default function ContatoPage() {
 
                 <div className="form-group">
                   <label htmlFor="units">
-                    <span className="label-icon">🏠</span>
+                    <span className="label-icon"><Home size={18} /></span>
                     Quantidade de Unidades
                   </label>
                   <input
@@ -170,7 +171,7 @@ export default function ContatoPage() {
 
                 <div className="form-group">
                   <label htmlFor="message">
-                    <span className="label-icon">💬</span>
+                    <span className="label-icon"><MessageSquare size={18} /></span>
                     Mensagem *
                   </label>
                   <textarea

@@ -1,44 +1,45 @@
+import { Package, AlertTriangle, Calendar, Megaphone, Users, FileText, Wrench, Bell } from 'lucide-react'
 import './Services.css'
 
 export default function Services() {
   const services = [
     {
-      icon: '📦',
+      icon: <Package size={32} />,
       title: 'Entregas',
       description: 'A portaria cadastra as encomendas, o morador recebe alerta no celular e retira apresentando o QR Code gerado pelo app.'
     },
     {
-      icon: '⚠️',
+      icon: <AlertTriangle size={32} />,
       title: 'Irregularidades',
       description: 'Morador realiza relatórios de irregularidades à administração, podendo anexar imagens e descrever o problema.'
     },
     {
-      icon: '📅',
+      icon: <Calendar size={32} />,
       title: 'Reservas',
       description: 'O morador faz as reservas das áreas comuns a qualquer hora, com aprovação automática ou manual conforme as regras.'
     },
     {
-      icon: '📢',
+      icon: <Megaphone size={32} />,
       title: 'Comunicados',
       description: 'A administração envia comunicados importantes e os moradores recebem notificação push em seus celulares.'
     },
     {
-      icon: '👥',
+      icon: <Users size={32} />,
       title: 'Visitantes',
       description: 'O morador autoriza a entrada de convidados e prestadores de serviços, podendo enviar convites por WhatsApp.'
     },
     {
-      icon: '📄',
+      icon: <FileText size={32} />,
       title: 'Documentos',
       description: 'Moradores têm acesso aos documentos do condomínio como atas, convenção, regulamento interno, entre outros.'
     },
     {
-      icon: '🔧',
+      icon: <Wrench size={32} />,
       title: 'Manutenções',
       description: 'Solicitação e acompanhamento de serviços de manutenção no condomínio, com histórico completo.'
     },
     {
-      icon: '🔔',
+      icon: <Bell size={32} />,
       title: 'Notificações',
       description: 'Sistema completo de notificações push para manter todos informados sobre eventos importantes.'
     }

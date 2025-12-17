@@ -1,5 +1,6 @@
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import { Smartphone, UserCog, Wrench, DoorOpen } from 'lucide-react'
 import './page.css'
 
 export default function HowToUsePage() {
@@ -7,22 +8,22 @@ export default function HowToUsePage() {
     {
       title: 'Moradores',
       description: 'Moradores utilizam a plataforma baixando o aplicativo na Apple Store (iOS) ou Play Store (Android). Moradores titulares por meio do aplicativo ingressam seus dependentes.',
-      icon: '📱'
+      icon: <Smartphone size={32} />
     },
     {
       title: 'Síndicos',
       description: 'Os síndicos recebem treinamento presencial e/ou online sobre como proceder com a inclusão de: usuários, áreas comuns, documentos, imagens de eventos e sobretudo de como visualizar e controlar as interações dos moradores.',
-      icon: '👨‍💼'
+      icon: <UserCog size={32} />
     },
     {
       title: 'Zelador',
       description: 'Os zeladores recebem treinamento presencial e/ou online sobre como gerenciar irregularidades, aprovar reservas de áreas comuns, visualizar relatórios e manter a comunicação com moradores e administração.',
-      icon: '🔧'
+      icon: <Wrench size={32} />
     },
     {
       title: 'Portaria',
       description: 'Os Agentes de Portaria recebem treinamento presencial e/ou online de como: Visualizar, editar as informações, gerar entrada e saída dos visitantes autorizados pelos moradores.',
-      icon: '🚪'
+      icon: <DoorOpen size={32} />
     }
   ]
 
